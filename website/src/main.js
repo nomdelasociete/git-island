@@ -110,6 +110,10 @@ const statusGlyph = (state) =>
   }</g></svg>`;
 let confirming = null;
 function renderInbox() {
+  const list = $("#pr-list");
+  const focusedMerge = list.contains(document.activeElement)
+    ? document.activeElement.closest("[data-merge]")?.dataset.merge
+    : null;
   const selected = prs.filter((pr) => filter === "all" || pr.state === filter);
   $("#pr-list").innerHTML = selected
     .map(
@@ -121,6 +125,9 @@ function renderInbox() {
  ${pr.state === "ready" ? `<button class="merge-demo" data-merge="${pr.number}" aria-label="${confirming === pr.number ? "Confirm simulated merge" : "Simulate merge"}">${confirming === pr.number ? "Confirm" : "Merge"}</button>` : ""}</div>`,
     )
     .join("");
+  if (focusedMerge) {
+    list.querySelector(`[data-merge="${CSS.escape(focusedMerge)}"]`)?.focus({ preventScroll: true });
+  }
   $("#inbox-label").textContent =
     filter === "all"
       ? "Pull requests"

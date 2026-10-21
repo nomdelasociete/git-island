@@ -5,6 +5,7 @@ import SwiftUI
 final class OnboardingWindowController: NSObject, NSWindowDelegate {
     private var window: OnboardingWindow?
     private(set) var dismissedByUser = false
+    private var completingSetup = false
 
     func present(store: GitIslandStore, automatically: Bool = false, onComplete: @escaping () -> Void) {
         guard !automatically || !dismissedByUser else { return }
@@ -17,6 +18,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
             store: store,
             onDismiss: { [weak self] in self?.dismiss() },
             onComplete: { [weak self] in
+                self?.completingSetup = true
                 self?.dismiss()
                 onComplete()
             }
@@ -38,7 +40,8 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         guard let closingWindow = notification.object as? NSWindow else { return }
-        dismissedByUser = true
+        dismissedByUser = !completingSetup
+        completingSetup = false
         // Retain the host until the SwiftUI action and AppKit close callback return.
         DispatchQueue.main.async { [weak self, closingWindow] in
             closingWindow.contentView = nil

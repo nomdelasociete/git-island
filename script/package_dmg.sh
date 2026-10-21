@@ -16,7 +16,7 @@ python="${DMG_PYTHON:-python3}"
 "$python" -c 'import ds_store, mac_alias'
 volume_name="Git Island"
 if $preview; then
-  [[ "$output" == *[Pp]review* ]] || { echo "Preview filename must contain preview" >&2; exit 2; }
+  [[ "$(basename "$output")" == *[Pp]review* ]] || { echo "Preview filename must contain preview" >&2; exit 2; }
   volume_name="Git Island — Installer Preview"
 else
   codesign --verify --deep --strict "$app"

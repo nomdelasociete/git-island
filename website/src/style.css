@@ -740,9 +740,6 @@ a {
     opacity: 1 !important;
     visibility: visible !important;
   }
-  .navigation {
-    display: none;
-  }
 }
 
 @media (max-height: 820px) {
