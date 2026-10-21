@@ -214,7 +214,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate {
     func onboardingDidComplete() {
-        onboardingController.dismiss()
         presentIsland()
         GitIslandStore.shared.startAutoRefresh()
     }
