@@ -3,9 +3,11 @@ import SwiftUI
 
 @MainActor
 final class OnboardingWindowController: NSObject, NSWindowDelegate {
-    private var window: OnboardingPanel?
+    private var window: OnboardingWindow?
+    private(set) var dismissedByUser = false
 
-    func present(store: GitIslandStore, onComplete: @escaping () -> Void) {
+    func present(store: GitIslandStore, automatically: Bool = false, onComplete: @escaping () -> Void) {
+        guard !automatically || !dismissedByUser else { return }
         if window?.isVisible == true {
             bringToFront()
             return
@@ -13,20 +15,21 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
         let contentView = OnboardingView(
             store: store,
-            onBrowserOpened: { [weak self] in
-                self?.bringToFront()
-            },
+            onDismiss: { [weak self] in self?.dismiss() },
             onComplete: { [weak self] in
                 self?.dismiss()
                 onComplete()
             }
         )
 
-        let window = OnboardingPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 520, height: 640)
+        let window = OnboardingWindow(
+            contentRect: NSRect(origin: .zero, size: OnboardingDesign.windowSize)
         )
         window.delegate = self
         window.title = "Git Island"
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
+        window.isMovableByWindowBackground = true
         window.center()
         window.contentView = NSHostingView(rootView: contentView)
         self.window = window
@@ -35,6 +38,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         guard let closingWindow = notification.object as? NSWindow else { return }
+        dismissedByUser = true
         // Retain the host until the SwiftUI action and AppKit close callback return.
         DispatchQueue.main.async { [weak self, closingWindow] in
             closingWindow.contentView = nil
@@ -43,7 +47,8 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     }
 
     func bringToFront() {
-        window?.orderFrontRegardless()
+        window?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     func dismiss() {
@@ -51,23 +56,22 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     }
 }
 
-private final class OnboardingPanel: NSPanel {
+private final class OnboardingWindow: NSWindow {
     init(contentRect: NSRect) {
         super.init(
             contentRect: contentRect,
-            styleMask: [.titled, .closable, .nonactivatingPanel],
+            styleMask: [.titled, .closable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
 
-        isFloatingPanel = true
-        level = .floating
+        level = .normal
         hidesOnDeactivate = false
         isReleasedWhenClosed = false
-        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        becomesKeyOnlyIfNeeded = true
     }
 
     override var canBecomeKey: Bool { true }
-    override var canBecomeMain: Bool { false }
+    override var canBecomeMain: Bool { true }
+
+    override func cancelOperation(_ sender: Any?) { performClose(sender) }
 }

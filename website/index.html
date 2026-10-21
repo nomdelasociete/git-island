@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#dce6e7" />
+    <meta
+      name="description"
+      content="A little island of calm for your GitHub pull requests. A cinematic, interactive Git Island prototype."
+    />
+    <title>Git Island — A little closer to clear.</title>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+  </head>
+  <body>
+    <header class="navigation">
+      <a class="wordmark" href="#top" aria-label="Git Island home"
+        ><img src="/git-island-logo.png" width="36" height="36" alt="" />git
+        island<span class="wordmark-dot">.</span></a
+      >
+      <nav aria-label="Main navigation">
+        <button class="quiet" data-go="0.91">Try the island</button
+        ><a
+          class="source-link"
+          href="https://github.com/nomdelasociete/git-island"
+          target="_blank"
+          rel="noopener noreferrer"
+          >View on GitHub <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </header>
+    <main id="top">
+      <section class="journey" aria-label="From an island to your Mac">
+        <div class="stage">
+          <div id="scene" aria-hidden="true"></div>
+          <div class="vignette"></div>
+          <div class="intro">
+            <div class="small-intro">
+              <span class="live-dot"></span>A little island of calm.
+            </div>
+            <h1>Your work.<br />A little<br />more <em>clear.</em></h1>
+            <p>
+              Your pull requests, right beside your MacBook’s notch. Less
+              checking. More making.
+            </p>
+            <button class="journey-button" data-go="0.47">
+              Take a closer look <span aria-hidden="true">↓</span>
+            </button>
+            <div class="compatibility">
+              Made for macOS 26 & notched MacBooks
+            </div>
+          </div>
+          <div class="device-copy" aria-hidden="true">
+            <span class="small-intro">At home on your Mac.</span>
+            <h2>A small detail.<br />A different day.</h2>
+            <p>
+              It’s not another window.<br />It’s the space you already have.
+            </p>
+          </div>
+          <div class="desktop" inert>
+            <div class="desktop-grain"></div>
+            <div class="island-app">
+              <svg id="status-outline" aria-hidden="true"></svg>
+              <div class="island-top">
+                <button
+                  data-filter="ready"
+                  class="counter ready"
+                  aria-label="Show ready pull requests"
+                >
+                  ✓ <span>2</span></button
+                ><button
+                  class="notch-toggle"
+                  aria-label="Expand Git Island"
+                  aria-expanded="false"
+                >
+                  <span class="camera-dot"></span>
+                </button>
+                <div class="other-counts">
+                  <button
+                    data-filter="blocked"
+                    class="counter blocked"
+                    aria-label="Show blocked pull requests"
+                  >
+                    ! <span>1</span></button
+                  ><button
+                    data-filter="waiting"
+                    class="counter waiting"
+                    aria-label="Show waiting pull requests"
+                  >
+                    ◷ <span>1</span></button
+                  ><button
+                    data-filter="testing"
+                    class="counter testing"
+                    aria-label="Show testing pull requests"
+                  >
+                    ◌ <span>1</span>
+                  </button>
+                </div>
+              </div>
+              <div class="inbox">
+                <div class="inbox-header">
+                  <span id="inbox-label">Pull requests</span
+                  ><span id="inbox-count">8</span
+                  ><button id="show-all" hidden>Show all</button>
+                </div>
+                <div id="pr-list"></div>
+              </div>
+            </div>
+            <div class="demo-controls">
+              <span id="activity-note" aria-live="polite"
+                >Fictional live activity</span
+              ><button id="pause-activity" aria-pressed="false">
+                Pause activity</button
+              ><button id="collapse">
+                Collapse <span aria-hidden="true">⌃</span>
+              </button>
+            </div>
+
+            <div class="desktop-message">
+              <span class="small-intro">Meet Git Island.</span>
+              <h2>Everything in view.<br />Nothing in your way.</h2>
+              <p>
+                Hover over the notch. Pick a status.<br />That’s your inbox,
+                without leaving your flow.
+              </p>
+              <button id="try-demo" class="journey-button">
+                Open the island <span aria-hidden="true">↑</span>
+              </button>
+            </div>
+            <div class="desktop-note">
+              Hover the notch to open Git Island. Fictional PRs; demo actions
+              stay in this browser.
+            </div>
+          </div>
+          <div class="journey-footer">
+            <button id="pause-motion" class="quiet" aria-pressed="false">
+              Pause motion
+            </button>
+            <div class="scroll-cue">
+              <span class="mouse-line"></span
+              ><span id="scroll-label">Scroll to explore</span>
+            </div>
+            <button class="skip" data-go="0.91">Skip to demo ↗</button>
+          </div>
+          <div class="progress-track"><div id="progress"></div></div>
+        </div>
+      </section>
+      <section class="closing" id="about">
+        <div class="closing-heading">
+          <span class="small-intro">A calmer corner of your desktop.</span>
+          <h2>Stay in your flow.<br />We’ll keep an eye out.</h2>
+          <a
+            class="solid-button"
+            href="https://github.com/nomdelasociete/git-island"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Explore Git Island <span aria-hidden="true">↗</span></a
+          ><button class="quiet replay" data-go="0">Replay the journey</button>
+        </div>
+        <div class="details">
+          <article>
+            <span class="detail-icon">⌘</span>
+            <h3>Belongs on your Mac.</h3>
+            <p>
+              A native Swift app, made for the space around your MacBook’s
+              notch. macOS 26 or later.
+            </p>
+          </article>
+          <article>
+            <span class="detail-icon">⎇</span>
+            <h3>Your GitHub, in focus.</h3>
+            <p>
+              Authored PRs and direct review requests. Four clear states, with
+              GitHub as the source of truth.
+            </p>
+          </article>
+          <article>
+            <span class="detail-icon">◉</span>
+            <h3>Make it yours.</h3>
+            <p>
+              Bring Git Island to your Mac. Or fork the code, add your own
+              ideas, and make an island that feels like you.
+            </p>
+            <div class="detail-links">
+              <a
+                href="https://github.com/nomdelasociete/git-island#build-from-source"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Install from source ↗</a
+              >
+              <a
+                href="https://github.com/nomdelasociete/git-island/fork"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Fork Git Island ↗</a
+              >
+            </div>
+          </article>
+        </div>
+        <footer>
+          <span
+            >git island.
+            <span class="muted">A little closer to clear.</span></span
+          ><a
+            href="https://github.com/nomdelasociete/git-island/blob/main/PRIVACY.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Privacy & permissions ↗</a
+          ><span class="muted">Made by NomDeLaSociete</span
+          ><a href="/models/ATTRIBUTION.txt">3D model credits ↗</a>
+        </footer>
+      </section>
+    </main>
+    <noscript
+      ><div class="no-script">
+        Git Island is a native macOS pull-request inbox. This interactive
+        journey needs JavaScript.
+        <a href="https://github.com/nomdelasociete/git-island"
+          >Explore the source on GitHub.</a
+        >
+      </div></noscript
+    >
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

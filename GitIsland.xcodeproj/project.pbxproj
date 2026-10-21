@@ -28,11 +28,14 @@
 		9CF29CA1E3A213D70A7C6FBB /* GitHubPullRequestService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7DCF20AF06569ACCAB6977 /* GitHubPullRequestService.swift */; };
 		9D4CAA71DEF4A0D4F1B33307 /* THIRD_PARTY_NOTICES.md in Resources */ = {isa = PBXBuildFile; fileRef = 5236709179B9F695E422EB61 /* THIRD_PARTY_NOTICES.md */; };
 		9F936320A528CFF69022AEBE /* GitHubTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763DCC271E265FD65BF7F4D /* GitHubTransport.swift */; };
+		A14B3BDE4814B17B0E8FDBE1 /* OnboardingWelcomeContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F719804CA4233E90F4042708 /* OnboardingWelcomeContent.swift */; };
 		A640B5312CE1DE1702878EB5 /* IslandHostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16717AFDAFEB28B3EAB31FF /* IslandHostView.swift */; };
 		AA745460DBCF5C5D596ED754 /* IslandStatusOutline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EBBC53467F72650DAA7982 /* IslandStatusOutline.swift */; };
 		B4DDE7078B8AB9B24D2A5D44 /* MergeConfettiController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D23B6058CDE0811113330DF /* MergeConfettiController.swift */; };
+		B922D84C3F872C9E24E404E9 /* OnboardingDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88292D010AD5332C4A055B1C /* OnboardingDesign.swift */; };
 		BF8DA8A9F78FA06A2E35C756 /* git-island-logo.png in Resources */ = {isa = PBXBuildFile; fileRef = C8C48312C2D7263B637DAC04 /* git-island-logo.png */; };
 		C139049F6B9362ED4EF492C9 /* PullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F30EC1A6420E86D4904A3C9 /* PullRequest.swift */; };
+		C8898032B84621D674F416C2 /* onboarding-island.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B90DD302FEB5348A9B149B4 /* onboarding-island.png */; };
 		CB63E6BFEB98087F1F201FD5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = AE7D107ABBDF4DB6BC0135DB /* LICENSE */; };
 		D163FCC67E4CBA50191B3DF4 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EBDDA141015B92E5F7FC61 /* UserPreferences.swift */; };
 		E913C112345F878B92A07A5E /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B1484F2BC17331354747EB3 /* KeychainTokenStore.swift */; };
@@ -55,8 +58,10 @@
 		5236709179B9F695E422EB61 /* THIRD_PARTY_NOTICES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = THIRD_PARTY_NOTICES.md; sourceTree = "<group>"; };
 		52EBBC53467F72650DAA7982 /* IslandStatusOutline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandStatusOutline.swift; sourceTree = "<group>"; };
 		5B03AE9839C0098670ACC81B /* GitIslandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitIslandApp.swift; sourceTree = "<group>"; };
+		5B90DD302FEB5348A9B149B4 /* onboarding-island.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "onboarding-island.png"; sourceTree = "<group>"; };
 		60C9D8F38F289CB786E8AC52 /* IslandSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandSound.swift; sourceTree = "<group>"; };
 		8763DCC271E265FD65BF7F4D /* GitHubTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubTransport.swift; sourceTree = "<group>"; };
+		88292D010AD5332C4A055B1C /* OnboardingDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingDesign.swift; sourceTree = "<group>"; };
 		974E85087765FE2FAFE8305A /* OnboardingWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWindowController.swift; sourceTree = "<group>"; };
 		9D23B6058CDE0811113330DF /* MergeConfettiController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeConfettiController.swift; sourceTree = "<group>"; };
 		9F9AB0629BA2E498A6288FCE /* GitHubAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAuthService.swift; sourceTree = "<group>"; };
@@ -74,6 +79,7 @@
 		E368CE235BA6836252593CFF /* IslandSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandSoundPlayer.swift; sourceTree = "<group>"; };
 		EB7DCF20AF06569ACCAB6977 /* GitHubPullRequestService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubPullRequestService.swift; sourceTree = "<group>"; };
 		F4E924AFE1180DEA11B9EB5E /* IslandPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandPanelController.swift; sourceTree = "<group>"; };
+		F719804CA4233E90F4042708 /* OnboardingWelcomeContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWelcomeContent.swift; sourceTree = "<group>"; };
 		F9A8FEDB6DBACD11B1E51CD6 /* git-island-menu-bar.svg */ = {isa = PBXFileReference; path = "git-island-menu-bar.svg"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -107,6 +113,7 @@
 				C8C48312C2D7263B637DAC04 /* git-island-logo.png */,
 				F9A8FEDB6DBACD11B1E51CD6 /* git-island-menu-bar.svg */,
 				03196CFFE36F27B3441EE843 /* git-merge-mark.svg */,
+				5B90DD302FEB5348A9B149B4 /* onboarding-island.png */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -115,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				41E533B04CCEA9EBF11420E6 /* IslandDesignSystem.swift */,
+				88292D010AD5332C4A055B1C /* OnboardingDesign.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
@@ -191,6 +199,7 @@
 				C16717AFDAFEB28B3EAB31FF /* IslandHostView.swift */,
 				52EBBC53467F72650DAA7982 /* IslandStatusOutline.swift */,
 				07EF04F28DCFC0000BCB5BDA /* OnboardingView.swift */,
+				F719804CA4233E90F4042708 /* OnboardingWelcomeContent.swift */,
 				4B97BD11D7AB5910ECDDF31D /* SettingsView.swift */,
 			);
 			path = Views;
@@ -273,6 +282,7 @@
 				BF8DA8A9F78FA06A2E35C756 /* git-island-logo.png in Resources */,
 				72B6EA2ADBBD45616C370693 /* git-island-menu-bar.svg in Resources */,
 				9996AB552FA5F87EBD722A1E /* git-merge-mark.svg in Resources */,
+				C8898032B84621D674F416C2 /* onboarding-island.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,7 +331,9 @@
 				AA745460DBCF5C5D596ED754 /* IslandStatusOutline.swift in Sources */,
 				E913C112345F878B92A07A5E /* KeychainTokenStore.swift in Sources */,
 				B4DDE7078B8AB9B24D2A5D44 /* MergeConfettiController.swift in Sources */,
+				B922D84C3F872C9E24E404E9 /* OnboardingDesign.swift in Sources */,
 				8C3E2B32452366640553A0B1 /* OnboardingView.swift in Sources */,
+				A14B3BDE4814B17B0E8FDBE1 /* OnboardingWelcomeContent.swift in Sources */,
 				F06A2A9A9A0DF5BCB93D86B2 /* OnboardingWindowController.swift in Sources */,
 				C139049F6B9362ED4EF492C9 /* PullRequest.swift in Sources */,
 				7FFBA998907A55B33E15F966 /* RelayDeviceSession.swift in Sources */,

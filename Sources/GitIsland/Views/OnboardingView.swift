@@ -3,7 +3,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     @ObservedObject var store: GitIslandStore
-    let onBrowserOpened: () -> Void
+    let onDismiss: () -> Void
     let onComplete: () -> Void
 
     @AppStorage("onboardingCompleted") private var onboardingCompleted = false
@@ -18,34 +18,44 @@ struct OnboardingView: View {
     @State private var isSigningIn = false
     @State private var signInError: String?
     @State private var didCopyCode = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            header
+        HStack(spacing: 0) {
+            OnboardingBrandPanel()
+            VStack(alignment: .leading, spacing: 0) {
+                header
 
-            Group {
-                switch step {
-                case .welcome:
-                    welcomeStep
-                case .permissions:
-                    permissionsStep
-                case .signIn:
-                    signInStep
-                case .verify:
-                    ScrollView { verificationStep }
-                case .appearance:
-                    appearanceStep
+                Group {
+                    switch step {
+                    case .welcome:
+                        welcomeStep
+                    case .permissions:
+                        permissionsStep
+                    case .signIn:
+                        signInStep
+                    case .verify:
+                        ScrollView { verificationStep }
+                    case .appearance:
+                        appearanceStep
+                    }
                 }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .padding(.horizontal, 28)
-            .padding(.bottom, 28)
-
-            footer
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .padding(.horizontal, 28)
-                .padding(.bottom, 24)
+                .padding(.bottom, 28)
+
+                footer
+                    .padding(.horizontal, 28)
+                    .padding(.bottom, 28)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(OnboardingDesign.paper)
         }
-        .frame(width: 520, height: 640)
+        .frame(width: OnboardingDesign.windowSize.width, height: OnboardingDesign.windowSize.height)
+        .foregroundStyle(OnboardingDesign.pine)
+        .tint(OnboardingDesign.pine)
+        .preferredColorScheme(.light)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: step)
         .onAppear {
             returningUser = onboardingCompleted
             if store.isAuthenticated && !store.githubAuthorizationRequired {
@@ -56,6 +66,7 @@ struct OnboardingView: View {
             }
         }
         .onDisappear { actionTask?.cancel() }
+        .onExitCommand(perform: dismissOnboarding)
         .onChange(of: store.githubAuthorizationRequired) { _, required in
             if required {
                 inboxVerificationSucceeded = false
@@ -78,7 +89,8 @@ struct OnboardingView: View {
                 return
             }
             if date >= verificationStarted, store.isAuthenticated,
-               store.lastError == nil, !store.githubAuthorizationRequired {
+                store.lastError == nil, !store.githubAuthorizationRequired
+            {
                 inboxVerificationSucceeded = true
             }
         }
@@ -90,22 +102,14 @@ struct OnboardingView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 14) {
-                if let url = Bundle.main.url(forResource: "git-island-logo", withExtension: "png"),
-                   let logo = NSImage(contentsOf: url) {
-                    Image(nsImage: logo).resizable().scaledToFit().frame(width: 64, height: 64)
-                        .accessibilityLabel("Git Island")
-                }
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("GIT ISLAND").font(.caption.weight(.semibold)).tracking(2)
-                    Text(returningUser ? "Let’s get you connected again" : "A little space for your pull requests")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            .padding(.bottom, 12)
+            Text(returningUser ? "Welcome back" : "Let’s get you settled")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(OnboardingDesign.pine.opacity(0.6))
+                .padding(.bottom, 10)
 
             Text(step.title)
-                .font(.system(size: 24, weight: .semibold))
+                .font(.system(size: 28, weight: .semibold))
+                .tracking(-0.8)
 
             Text(step.subtitle(signInPhase: signInPhase))
                 .font(.system(size: 13))
@@ -113,29 +117,11 @@ struct OnboardingView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, 28)
-        .padding(.top, 28)
+        .padding(.top, 48)
         .padding(.bottom, 20)
     }
 
-    private var welcomeStep: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            featureRow(
-                symbol: "circle.grid.3x1.fill",
-                title: "Four states. One quiet island.",
-                detail: "Blocked, waiting, testing, and ready — around your MacBook’s notch when you have open PRs."
-            )
-            featureRow(
-                symbol: "hand.point.up.left.fill",
-                title: "Hover to expand",
-                detail: "Glance at your most urgent pull requests without leaving your flow."
-            )
-            featureRow(
-                symbol: "arrow.up.forward.app",
-                title: "Click to open on GitHub",
-                detail: "Jump straight into the PR when something needs attention."
-            )
-        }
-    }
+    private var welcomeStep: some View { OnboardingWelcomeContent() }
 
     private var permissionsStep: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -145,13 +131,16 @@ struct OnboardingView: View {
             )
             permissionRow(
                 title: "Repository read and write access",
-                detail: "GitHub’s repo scope includes private repositories and write access. Repository filters only limit what Git Island displays."
+                detail:
+                    "GitHub’s repo scope includes private repositories and write access. Repository filters only limit what Git Island displays."
             )
 
-            Text("Git Island reads your PRs and review requests directly from GitHub. Merging or updating a branch only happens when you choose that action in the app. Your token stays in the macOS Keychain.")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .padding(.top, 6)
+            Text(
+                "Git Island reads your PRs and review requests directly from GitHub. Merging or updating a branch only happens when you choose that action in the app. Your token stays in the macOS Keychain."
+            )
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .padding(.top, 6)
         }
     }
 
@@ -161,16 +150,20 @@ struct OnboardingView: View {
                 Text("GitHub sign-in is not available in this build yet.")
                     .font(.system(size: 13, weight: .semibold))
 
-                Text("If you are installing a release build, the publisher still needs to finish OAuth setup.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                Text(
+                    "If you are installing a release build, the publisher still needs to finish OAuth setup."
+                )
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
             } else if signInPhase == .ready {
-                Text("Git Island will give you a one-time code to paste on GitHub. Your password never goes through the app.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                Text(
+                    "Git Island will give you a one-time code to paste on GitHub. Your password never goes through the app."
+                )
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
 
                 if let signInError {
                     Text(signInError)
@@ -219,9 +212,12 @@ struct OnboardingView: View {
 
     private var verificationStep: some View {
         VStack(alignment: .leading, spacing: 20) {
-            featureRow(symbol: githubVerified ? "checkmark.circle.fill" : "arrow.triangle.2.circlepath",
-                       title: githubVerified ? "GitHub inbox verified" : "Checking your GitHub inbox",
-                       detail: githubVerified ? "Loaded \(store.pullRequests.count) pull requests from GitHub. An empty inbox is a successful connection too." : "We’re checking that Git Island can actually read your pull requests.")
+            featureRow(
+                symbol: githubVerified ? "checkmark.circle.fill" : "arrow.triangle.2.circlepath",
+                title: githubVerified ? "GitHub inbox verified" : "Checking your GitHub inbox",
+                detail: githubVerified
+                    ? "Loaded \(store.pullRequests.count) pull requests from GitHub. An empty inbox is a successful connection too."
+                    : "We’re checking that Git Island can actually read your pull requests.")
             if let error = store.lastError {
                 Text(error).font(.caption).foregroundStyle(.red).textSelection(.enabled)
             }
@@ -231,14 +227,20 @@ struct OnboardingView: View {
                     verificationStarted = Date()
                     store.refresh(force: true)
                 }
-                    .disabled(store.isLoading)
+                .disabled(store.isLoading)
             }
             Divider()
-            featureRow(symbol: store.relayConnected ? "bolt.fill" : "clock",
-                       title: store.relayConnected ? "Live updates connected" : "Using periodic refresh",
-                       detail: store.relayConnected ? "The live connection is active. GitHub remains the source of your PR data." : "Your inbox still refreshes automatically. Connect live updates to hear about changes sooner.")
+            featureRow(
+                symbol: store.relayConnected ? "bolt.fill" : "clock",
+                title: store.relayConnected ? "Live updates connected" : "Using periodic refresh",
+                detail: store.relayConnected
+                    ? "The live connection is active. GitHub remains the source of your PR data."
+                    : "Your inbox still refreshes automatically. Connect live updates to hear about changes sooner."
+            )
             if !store.relayConnected {
-                Button(store.relayDevice.isEnrolling ? "Waiting for browser approval…" : "Connect live updates") {
+                Button(
+                    store.relayDevice.isEnrolling ? "Waiting for browser approval…" : "Connect live updates"
+                ) {
                     store.relayDevice.enroll(origin: UserPreferences.relayOrigin)
                 }.disabled(store.relayDevice.isBusy || store.relayDevice.isEnrolling)
                 if store.relayDevice.isEnrolling {
@@ -248,8 +250,10 @@ struct OnboardingView: View {
             if let message = store.relayDevice.message {
                 Text(message).font(.caption).foregroundStyle(.secondary)
             }
-            Text("Live updates are optional. You can continue once GitHub is verified and connect them later in Settings.")
-                .font(.caption).foregroundStyle(.secondary)
+            Text(
+                "Live updates are optional. You can continue once GitHub is verified and connect them later in Settings."
+            )
+            .font(.caption).foregroundStyle(.secondary)
         }
     }
 
@@ -262,29 +266,46 @@ struct OnboardingView: View {
                 LabeledContent("Line spacing") {
                     Slider(value: laneSelection(\.gap), in: OutlineLaneStyle.gapRange)
                 }
-                Toggle("Crazy animations", isOn: Binding(get: { store.crazyAnimationsEnabled }, set: { store.updateCrazyAnimationsEnabled($0) }))
+                Toggle(
+                    "Crazy animations",
+                    isOn: Binding(
+                        get: { store.crazyAnimationsEnabled }, set: { store.updateCrazyAnimationsEnabled($0) }))
             } footer: {
-                Text("These settings apply to your actual island at the top of the screen. With no open PRs, it stays hidden. Motion follows your Mac’s Reduce Motion setting.")
+                Text(
+                    "These settings apply to your actual island at the top of the screen. With no open PRs, it stays hidden. Motion follows your Mac’s Reduce Motion setting."
+                )
             }
             Section {
-                Picker("New PR sound", selection: Binding(get: { store.sound(for: .newPullRequest) }, set: { store.updateSound($0, for: .newPullRequest) })) {
+                Picker(
+                    "New PR sound",
+                    selection: Binding(
+                        get: { store.sound(for: .newPullRequest) },
+                        set: { store.updateSound($0, for: .newPullRequest) })
+                ) {
                     Text("Silent").tag(IslandSoundChoice.none)
                     Text("Glass").tag(IslandSoundChoice.system("Glass"))
-                    if store.sound(for: .newPullRequest) != .none && store.sound(for: .newPullRequest) != .system("Glass") {
+                    if store.sound(for: .newPullRequest) != .none
+                        && store.sound(for: .newPullRequest) != .system("Glass")
+                    {
                         Text(store.sound(for: .newPullRequest).label).tag(store.sound(for: .newPullRequest))
                     }
                 }
             }
             LaunchAtLoginSection()
         }.formStyle(.grouped)
+            .scrollContentBackground(.hidden)
     }
 
-    private func laneSelection(_ keyPath: WritableKeyPath<OutlineLaneStyle, CGFloat>) -> Binding<CGFloat> {
-        Binding(get: { store.outlineLaneStyle[keyPath: keyPath] }, set: { value in
-            var style = store.outlineLaneStyle
-            style[keyPath: keyPath] = value
-            store.updateOutlineLaneStyle(style)
-        })
+    private func laneSelection(_ keyPath: WritableKeyPath<OutlineLaneStyle, CGFloat>) -> Binding<
+        CGFloat
+    > {
+        Binding(
+            get: { store.outlineLaneStyle[keyPath: keyPath] },
+            set: { value in
+                var style = store.outlineLaneStyle
+                style[keyPath: keyPath] = value
+                store.updateOutlineLaneStyle(style)
+            })
     }
 
     private var signInInstruction: String {
@@ -298,8 +319,18 @@ struct OnboardingView: View {
         }
     }
 
+    private func dismissOnboarding() {
+        actionTask?.cancel()
+        actionTask = nil
+        onDismiss()
+    }
+
     private var footer: some View {
         HStack {
+            Button("Set up later", action: dismissOnboarding)
+                .keyboardShortcut("w", modifiers: .command)
+                .help("Close setup. You can return from the Git Island menu.")
+
             if step == .permissions || (step == .signIn && !returningUser) {
                 Button("Back") {
                     resetSignInState()
@@ -314,15 +345,19 @@ struct OnboardingView: View {
             Button(primaryButtonTitle) {
                 actionTask = Task { await handlePrimaryAction() }
             }
+            .buttonStyle(OnboardingPrimaryButtonStyle())
             .keyboardShortcut(.defaultAction)
             .disabled(primaryButtonDisabled)
+            .opacity(primaryButtonDisabled ? 0.45 : 1)
         }
     }
 
     private var primaryButtonTitle: String {
         switch step {
-        case .welcome, .permissions:
-            "Continue"
+        case .welcome:
+            "Set up Git Island"
+        case .permissions:
+            "Continue to GitHub"
         case .verify:
             returningUser ? "Back to my island" : "Make it yours"
         case .appearance:
@@ -384,6 +419,7 @@ struct OnboardingView: View {
 
         do {
             let session = try await store.beginDeviceSignIn()
+            try Task.checkCancellation()
             deviceSession = session
             userCode = session.userCode
             signInPhase = .codeReady
@@ -409,7 +445,6 @@ struct OnboardingView: View {
             signInError = "Couldn’t open your browser. Try opening GitHub again."
             return
         }
-        onBrowserOpened()
 
         do {
             inboxVerificationSucceeded = false
@@ -491,26 +526,26 @@ private enum OnboardingStep {
     var title: String {
         switch self {
         case .welcome:
-            "Your PR radar lives in the notch"
+            "Welcome to your island."
         case .permissions:
-            "What Git Island needs"
+            "Your GitHub. Your choice."
         case .signIn:
             "Connect GitHub"
         case .verify:
-            "A connection you can trust"
+            "Let’s check the connection."
         case .appearance:
-            "Make your island feel like you"
+            "A few finishing touches."
         }
     }
 
     func subtitle(signInPhase: SignInPhase) -> String {
         switch self {
         case .welcome:
-            "A quiet native companion for the pull requests you care about."
+            "Your pull requests, right beside your MacBook’s notch. Here’s how it works."
         case .permissions:
-            "Git Island reads PR status to keep your counters accurate."
+            "Before you connect, here’s exactly what you’ll authorize."
         case .verify:
-            "GitHub data and live updates are checked separately."
+            "We’ll confirm your inbox is reachable. Live updates are optional."
         case .appearance:
             "A few first choices. Everything stays adjustable in Settings."
         case .signIn:

@@ -162,3 +162,40 @@ Remaining release work includes hosted-service security/retention verification,
 authorized live acceptance, artwork provenance, Apple distribution review,
 signed release validation, and real notched-hardware checks. Repository
 visibility and branch-protection enforcement are separate publication decisions.
+
+### Website transition prototype
+
+`website/` contains an isolated Vite/Three.js prototype for gitis.land: a
+scroll-driven procedural island with credited CC0 boat models and a rigged whale,
+a credited CC BY MacBook Pro model, and an HTML Git Island inbox with eight
+fictional PRs and pausable status updates. The browser island now follows native
+source layout, colors, row metrics, outline and hover behavior. The page uses the official app logo. It includes scroll navigation, mobile layouts,
+reduced-motion handling, and a WebGL fallback. The production web build and
+local browser interaction checks pass. This prototype is not deployed and does
+not modify or launch the native app. See website/README.md for local use.
+
+### Direct-download onboarding design (local preview)
+
+The native first-launch flow uses the website’s sea and pine palette, official
+logo, and credited island artwork. Welcome, permission disclosure, GitHub device
+sign-in, inbox verification, and appearance setup share a wider native shell.
+Authorization behavior is preserved, and transitions respect Reduce Motion.
+
+`packaging/` and `script/package_dmg.sh` provide matching Retina installer artwork
+and a Finder drag-to-Applications layout. The release path verifies signing,
+Gatekeeper assessment, and the app’s stapled ticket; packaging does not sign or
+notarize the resulting DMG. A separately labeled unsigned Debug preview was built
+locally. Compile-only Xcode validation and all 113 ordinary SwiftPM tests pass.
+The shared welcome components were rendered for design inspection; full native
+runtime, Finder layout, and quarantined signed-download validation remain pending.
+Nothing has been published.
+
+Onboarding dismissal now uses a normal window with an always-enabled Set up later
+action, Escape and Command-W. Closing cancels pending view sign-in work and
+suppresses automatic authorization-recovery reopening for the current session;
+manual setup from the menu remains available. The app, website, favicon, onboarding
+and installer share a new sea-and-pine island icon; the menu bar uses a simplified
+monochrome island silhouette. The new raster icon was generated with the built-in
+image tool (miniature low-poly island, three pines, pale sea, moss land; edited to remove the invented black pill and colored dots,
+with no lettering, interface elements or computer). Native close-control interaction
+validation remains pending because the UI automation service timed out.
