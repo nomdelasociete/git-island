@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Install verified XcodeGen 2.46.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          tools_dir="$RUNNER_TEMP/git-island-tools"
+          mkdir -p "$tools_dir"
+          curl --fail --silent --show-error --location --retry 3 \
+            https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip \
+            -o "$tools_dir/xcodegen.zip"
+          echo "4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806  $tools_dir/xcodegen.zip" | shasum -a 256 -c -
+          unzip -q "$tools_dir/xcodegen.zip" -d "$tools_dir"
+          echo "$tools_dir/xcodegen/bin" >> "$GITHUB_PATH"
+      - name: Toolchain and project consistency
+        run: |
+          xcodebuild -version
+          swift --version
+          xcodegen --version
+          xcodegen generate --spec project.yml
+          git diff --exit-code -- GitIsland.xcodeproj
+      - name: Unit tests without live service credentials
+        run: env -u GITHUB_TOKEN -u GH_TOKEN -u RELAY_LIVE_VALIDATION_DIR -u RELAY_LIVE_GITHUB_TOKEN swift test --skip RelayLiveAcceptanceTests
+      - name: Unsigned Debug build
+        run: >-
+          xcodebuild -project GitIsland.xcodeproj -scheme GitIsland
+          -configuration Debug -destination 'platform=macOS'
+          -derivedDataPath "$RUNNER_TEMP/GitIslandDerivedData"
+          build CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM=
+      - name: Verify packaged license notices
+        run: |
+          resources="$RUNNER_TEMP/GitIslandDerivedData/Build/Products/Debug/Git Island Dev.app/Contents/Resources"
+          cmp PrivacyInfo.xcprivacy "$resources/PrivacyInfo.xcprivacy"
+          plutil -lint "$resources/PrivacyInfo.xcprivacy"
+          cmp LICENSE "$resources/LICENSE"
+          cmp THIRD_PARTY_NOTICES.md "$resources/THIRD_PARTY_NOTICES.md"
+
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install verified Gitleaks 8.30.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          tools_dir="$RUNNER_TEMP/git-island-tools"
+          mkdir -p "$tools_dir"
+          curl --fail --silent --show-error --location --retry 3 \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            -o "$tools_dir/gitleaks.tar.gz"
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $tools_dir/gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf "$tools_dir/gitleaks.tar.gz" -C "$tools_dir" gitleaks
+          echo "$tools_dir" >> "$GITHUB_PATH"
+      - name: Scan history without printing findings
+        run: bash script/check-secrets.sh
+      - name: Check shell syntax
+        run: |
+          for file in script/*.sh; do bash -n "$file"; done

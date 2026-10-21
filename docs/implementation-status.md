@@ -1,0 +1,164 @@
+# Git Island implementation status
+
+## What has been built
+
+- Debug builds use Git Island Dev (com.nomdelasociete.GitIsland.dev), with
+  separate preferences and Keychain identity. Release keeps the TestFlight
+  identity. The local build script only accepts Debug and defaults to ad-hoc
+  signing. TestFlight 0.12 (202610100026) was verified running from Applications
+  with Apple's TestFlight signature on 2026-10-18.
+
+- The island window passes mouse events through while compact and outside its
+  visible expanded surface. Independent pointer tracking preserves hover, and
+  routing changes never resize the expanded host. AppKit regression tests cover
+  compact input, leaving/re-entering the expanded surface, and collapse.
+  The user verified adjacent menu-bar clicks in both compact and expanded
+  states on their Mac on 2026-10-18.
+
+- Guided onboarding uses the current logo, explains GitHub permissions, verifies
+  an actual inbox read, and reports the live relay connection separately. Live
+  enrollment is optional; periodic refresh remains available. Initial outline,
+  animation, sound, and launch-at-login settings apply to the real app. Completed
+  onboarding is remembered; GitHub 401 responses reopen connection recovery
+  without resetting preferences. Temporary network errors do not reopen it.
+  Compile and unit validation completed; visual validation on notched hardware
+  remains pending.
+
+- Native macOS app with an AppKit borderless panel anchored to the real MacBook
+  notch area.
+- The panel is only shown on displays that expose macOS auxiliary notch screen
+  areas, so external displays without a notch are ignored.
+- Compact island is the notch only, with a single status outline around it
+  (keeps the menu bar free for macOS 27 status items). Each status owns a
+  share of the outline proportional to its PR count:
+  - amber `waiting`
+  - blue `testing`
+  - red `blocked`
+  - green `ready`
+- Hover opens the island Dynamic Island–style (widen then drop; rise then
+  narrow on close). Status counters appear in the wings only while opened, and
+  the outline stays visible and morphs with the surface.
+- Status changes animate on the outline: boundaries spring to the new
+  proportions and a sheen runs from the old status segment to the new one.
+  Crazy mode adds waves of the status color radiating from the outline.
+- Opened state shows minimal actionable PR rows and clicking a row opens the PR
+  on GitHub.
+- GitHub data is real, using the authenticated local account through
+  Git Island OAuth, `GITHUB_TOKEN`, or `GH_TOKEN`.
+- The inbox is fetched with one batch GraphQL request (aliased searches with the
+  same scope as the REST queries). It falls back to the per-PR REST path when
+  GraphQL errors, a search or a PR's check contexts exceed one page, or the
+  repository filter needs more than 8 searches. The query costs about 4
+  rate-limit points (rollup contexts instead of nested check suites).
+- GitHub PR inbox buckets are approximated by two broad candidate search queries
+  followed by classification from PR details, GitHub GraphQL merge/review
+  readiness, reviews, check runs, and commit statuses:
+  - `blocked`: authored open drafts, merge conflicts, requested changes, failing checks, or GitHub-blocked PRs
+  - `waiting`: authored open PRs where GitHub reports `REVIEW_REQUIRED`, plus directly review-requested PRs that only need your review
+  - `testing`: authored open PRs with pending checks
+  - `ready`: authored open PRs or directly review-requested PRs that GitHub reports as green, including repos where review is not required; a branch that is only behind the base branch stays ready and shows an update action
+- Relay v2 client supports browser device enrollment, a computer identity distinct
+  from its linked GitHub installations, automatic access-token rotation, and
+  revocation. Access and refresh tokens share one device-only Keychain item;
+  a persisted request ID resumes a rotation after a lost response or restart.
+  Pending revocations also survive restart and retry without renewing access. SSE expiration/401 renews access without directly
+  refreshing GitHub. Legacy v1 credentials remain untouched in their separate Keychain item and are
+  no longer used after successful v2 enrollment; 404/503 setup responses preserve the existing connection. The authority and browser origins are fixed deployment trust anchors, separate
+  from the configurable relay origin; mutable preferences cannot redirect enrollment or refresh credentials. Public
+  enrollment still requires the relay authorization service to be available.
+- Optional relay SSE wakes use a per-computer token stored separately in Keychain.
+  A validated event stream refreshes GitHub on connection and wake, coalesces
+  in-flight demand, and respects GitHub rate-limit deadlines. Connected streams
+  suspend polling; disconnected configured streams poll every 60 seconds.
+  Refresh settings configure the relay origin and browser authorization, and create or revoke a wake hook. The legacy token remains in its separate Keychain item, unused after v2 enrollment.
+  OAuth sign-out preserves the computer token. Relay never receives OAuth tokens.
+- Without relay configuration, the app uses adaptive local-only refresh: prompt event-driven refreshes, capped
+  by a short minimum spacing, on app focus, island interaction, system wake,
+  network return, and merge actions; temporary 20-30s bursts while activity is
+  fresh or checks are running; then fallback to the saved idle interval. Manual
+  refresh restarts an in-flight GitHub fetch so a slow request does not make the
+  control feel dead.
+- **2026-07-03**: Work on Epic #43 completed on jb/refresh-freshness-epic (slices 1-4 + diagnostics + GraphQL query expansion + richer tracking).
+  ETags + caching (304s for stable), parallel + paginated searches, 15s cadence for testing, expanded GraphQL per-PR for future reviews data, richer diagnostics with candidates/304/breakdown.
+  Builds clean. See docs/refresh-improvement-epic.md and GitHub #43.
+  Current description below reflects pre-epic for context.
+- Settings expose refresh diagnostics: in-flight state, reason, last
+  start/finish, duration, next scheduled refresh, last message, and copyable
+  debug text.
+- Settings can scope GitHub data to all repositories or to a saved subset of
+  `owner/repository` names. Selected repository mode scopes GitHub search
+  queries with `repo:` qualifiers instead of filtering only after fetch.
+- Settings is a sidebar window (General, Appearance, Sounds, Refresh,
+  Repositories). Appearance has a live outline preview and lets the user set
+  lane width, spacing, and the lane limit before lanes fuse.
+- General settings offer opt-in launch at login using macOS login item
+  registration, with system approval guidance and registration error feedback.
+- Per-event sounds (new PR, ready, blocked, waiting, checks running, merged):
+  none, a macOS system sound, or an imported file copied into Application
+  Support. One refresh plays only its most important event.
+- The expanded PR list follows the outline's color order (ready, blocked,
+  waiting, testing), oldest first within each status.
+- A project-local `script/build_and_run.sh` builds, stages, and launches the app
+  as a `.app` bundle.
+- A project-local `script/testflight.sh` can archive and upload to App Store
+  Connect using automatic signing.
+- A generated `GitIsland.xcodeproj` provides a native Xcode macOS app target for
+  development builds and local signing.
+- First-run onboarding with welcome, permissions, and GitHub device flow sign-in.
+- Keychain token storage with sign-out from Settings.
+- Expanded island shows PR titles, up to five scrollable rows, and inline
+  loading/error states.
+- SwiftPM regression tests cover the known GitHub PR classification states.
+
+## What is intentionally not done yet
+- No full GitHub repository browser. Repository selection is manual plus repos
+  discovered from currently loaded PRs.
+- No exact private GitHub PR Inbox API integration. GitHub does not expose this
+  new inbox surface as a stable public API, so the current behavior mirrors it
+  through documented search qualifiers.
+- Repository selection is persisted in UserDefaults; visible-group selection is transient.
+- Idle auto-refresh interval preference is saved in UserDefaults.
+- No Sparkle updater or self-managed release artifact. TestFlight/App Store
+  Connect is the prepared distribution path.
+- Second design pass: true notch gap, wing tabs, list-style rows, calmer motion.
+- Further shape tuning may still be needed against specific MacBook notch sizes.
+
+## Known product/design gaps
+
+- The four status buckets are intentionally compressed. GitHub's full PR page
+  also has separate buckets such as review requests and drafts.
+- GitHub search is used only to find candidate PRs. Displayed bucket labels are
+  based on verified PR details, GitHub `reviewDecision` / `mergeStateStatus`,
+  reviews, check runs, and commit statuses.
+- A PR with no required review and no active check/status contexts is shown as
+  ready when GitHub reports it mergeable; otherwise it stays waiting.
+- Long PR titles truncate to one line; full title is available on hover tooltip.
+
+### Live access account binding (pending release)
+
+Relay pairing, restored credentials and renewed access require the authority’s authenticated computer subject to match the native token’s `/user` ID. Account switches and late identity responses cannot re-enable a previous session. Legacy unbound stream tokens fail closed; periodic GitHub reads remain available. Requires the authority `/computers/identity` endpoint before client rollout. Verified with session regression tests and compile-only Xcode builds; real two-account GitHub testing is still pending.
+
+### Open-source repository preparation
+
+The repository starts with a clean source snapshot. Original development credit
+is recorded in AUTHORS.md; GPL-3.0-only and third-party notices are preserved.
+Private development history, discussions, review links and audit evidence are
+not included.
+
+The snapshot includes credential-free CI, synthetic test identities, issue/PR
+templates, security reporting, privacy disclosures, and a bundled UserDefaults
+privacy manifest. The source revision passed 113 ordinary SwiftPM tests and
+unsigned Debug and Release builds. Its Xcode 26.2 hosted CI passed; this new
+repository runs its own independent CI.
+
+Credential read retries preserve valid credentials. Explicit sign-out persists
+before deletion, exposes cleanup failures, and suppresses environment tokens.
+Environment credentials are Debug-only. Relay credentials are restricted to the
+official origin, and cleanup is retried after revocation or rejected refresh.
+Authenticated GitHub traffic rejects redirects and unexpected destinations;
+copied diagnostics omit free-form private text.
+
+Remaining release work includes hosted-service security/retention verification,
+authorized live acceptance, artwork provenance, Apple distribution review,
+signed release validation, and real notched-hardware checks. Repository
+visibility and branch-protection enforcement are separate publication decisions.

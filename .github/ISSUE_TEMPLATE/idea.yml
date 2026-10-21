@@ -1,0 +1,16 @@
+name: Idea
+description: Propose a focused improvement.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Suggested behavior and alternatives
+      description: Explain how this fits a quiet, native PR status app. Mention new permissions or services.
+    validations:
+      required: true

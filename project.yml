@@ -1,0 +1,93 @@
+name: GitIsland
+
+options:
+  bundleIdPrefix: com.nomdelasociete
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.2"
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    CLANG_ENABLE_MODULES: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    ENABLE_HARDENED_RUNTIME: YES
+
+targets:
+  GitIsland:
+    type: application
+    platform: macOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Sources/GitIsland
+        excludes:
+          - Support/README.md
+      - path: Assets
+        buildPhase: resources
+      - path: PrivacyInfo.xcprivacy
+        buildPhase: resources
+      - path: LICENSE
+        buildPhase: resources
+      - path: THIRD_PARTY_NOTICES.md
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_NAME: Git Island
+        PRODUCT_MODULE_NAME: GitIsland
+        PRODUCT_BUNDLE_IDENTIFIER: com.nomdelasociete.GitIsland
+        ASSETCATALOG_COMPILER_APPICON_NAME: git-island-icon
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Git Island
+        INFOPLIST_KEY_CFBundleName: Git Island
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_LSMinimumSystemVersion: "26.0"
+        INFOPLIST_KEY_NSPrincipalClass: NSApplication
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        CURRENT_PROJECT_VERSION: "202610100027"
+        DEVELOPMENT_TEAM: JSFMAD28GS
+        ENABLE_APP_SANDBOX: YES
+        MARKETING_VERSION: "0.12"
+        CODE_SIGN_STYLE: Automatic
+      configs:
+        Debug:
+          PRODUCT_NAME: Git Island Dev
+          PRODUCT_BUNDLE_IDENTIFIER: com.nomdelasociete.GitIsland.dev
+          INFOPLIST_KEY_CFBundleDisplayName: Git Island Dev
+          INFOPLIST_KEY_CFBundleName: Git Island Dev
+          CODE_SIGN_IDENTITY: Apple Development
+          CODE_SIGN_ENTITLEMENTS: GitIsland.entitlements
+        Release:
+          CODE_SIGN_ENTITLEMENTS: GitIsland.entitlements
+
+    postBuildScripts:
+      - name: Verify menu-bar-only app
+        basedOnDependencyAnalysis: false
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
+        script: |
+          set -eu
+          plist="${TARGET_BUILD_DIR}/${INFOPLIST_PATH}"
+          agent=$(/usr/libexec/PlistBuddy -c 'Print :LSUIElement' "$plist" 2>/dev/null || true)
+          if [ "$agent" != "true" ]; then
+            echo "error: Git Island must never appear in the Dock. Built Info.plist must declare LSUIElement=true."
+            exit 1
+          fi
+
+schemes:
+  GitIsland:
+    build:
+      targets:
+        GitIsland: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

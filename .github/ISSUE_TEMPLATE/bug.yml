@@ -1,0 +1,23 @@
+name: Bug report
+description: Something does not behave as expected.
+labels: [bug]
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Steps, expected behavior, and actual behavior. Use invented PRs; remove private data from screenshots.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: App version or commit, macOS version, and Mac model
+      description: Include whether the display has a notch and whether this is a Debug or official build.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Optional redacted diagnostics
+      description: Review text before sharing. Never include tokens, device codes, hook secrets, or private repository information.
