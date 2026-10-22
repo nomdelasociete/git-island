@@ -199,3 +199,11 @@ monochrome island silhouette. The new raster icon was generated with the built-i
 image tool (miniature low-poly island, three pines, pale sea, moss land; edited to remove the invented black pill and colored dots,
 with no lettering, interface elements or computer). Native close-control interaction
 validation remains pending because the UI automation service timed out.
+
+### Public website deployment
+
+The merged website is deployed at https://gitis.land using Cloudflare Workers
+static assets in NOM DE LA SOCIETE. Versioned cf CLI/Vite tooling, explicit account
+and custom-domain configuration, and repeatable deployment instructions are in
+`website/`. HTTPS and static asset delivery are verified. App downloads still
+link to source-build instructions; no signed DMG release is published.
