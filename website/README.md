@@ -64,13 +64,14 @@ droplet splash and expanding water ripples; pause and reduced motion apply.
 ## Deploy
 
 The pinned `cf` CLI deploys to the NOM DE LA SOCIETE account selected explicitly
-in `cloudflare.config.ts`. Authenticate with `cf auth login`, then from `website/`
-run `npm ci` and `npm run deploy`. The Vite plugin generates Cloudflare Build
+in `cloudflare.config.ts`. From `website/`, install the pinned tooling with
+`npm ci`, authenticate with `npx --no-install cf auth login`, then run
+`npm run deploy`. The Vite plugin generates Cloudflare Build
 Output; only generated static assets are uploaded. The `gitis.land` custom domain
 is managed by the deployment. No runtime bindings or application secrets are used.
 
-Use `npx cf deploy --dry-run` to validate first. To publish that exact build, use
-`npx cf deploy --prebuilt --mode production`. Generated `.cloudflare/` and
+Use `npx --no-install cf deploy --dry-run` to validate first. To publish that exact build, use
+`npx --no-install cf deploy --prebuilt --mode production`. Generated `.cloudflare/` and
 `.wrangler/` directories are ignored. Unknown paths return 404. Deployment is
 manual; repository CI builds the site but does not publish it.
 
