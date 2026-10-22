@@ -73,3 +73,9 @@ Use `npx cf deploy --dry-run` to validate first. To publish that exact build, us
 `npx cf deploy --prebuilt --mode production`. Generated `.cloudflare/` and
 `.wrangler/` directories are ignored. Unknown paths return 404. Deployment is
 manual; repository CI builds the site but does not publish it.
+
+Social sharing uses static Open Graph and Twitter card metadata in `index.html`
+and the 1200 × 630 `public/social-preview-v1.png` image, rendered from the actual
+website scene with navigation controls hidden. The scene model credits in
+`public/models/ATTRIBUTION.txt` also apply to this render. Version the image URL
+when replacing it so social crawlers can retrieve the new asset.
