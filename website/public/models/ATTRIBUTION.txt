@@ -1,0 +1,23 @@
+MacBook Pro M3 16 inch 2024
+Author: Jack Baeten (jackbaeten), https://sketchfab.com/jackbaeten
+Source: https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2024-8e34fc2b303144f78490007d91ff57c4
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+Asset obtained from https://github.com/Riyaban583/3D-Apple-Website/blob/main/public/models/macbook-14.glb
+The GLB includes author, source and license metadata. Previously optimized with glTF-Transform.
+Adaptations for this prototype: scale, placement, lighting and display texture.
+This asset is separately licensed from the GPL-3.0-only website source.
+Apple and MacBook are trademarks of Apple Inc.; no endorsement is implied.
+
+Draco decoder: Copyright Google Inc. Apache License 2.0.
+See ../draco/LICENSE.txt.
+
+Whale by Quaternius — Public Domain / CC0.
+Source: https://poly.pizza/m/JGFwp6xWgk
+Download: https://static.poly.pizza/7300e697-2543-4a9a-a77d-dedf29251fd7.glb
+Original rigged Swim animation retained. Adapted scale, placement and playback speed.
+
+Boat Sail B by Kenney — CC0.
+Source: https://kenney.nl/assets/watercraft-kit
+See KENNEY-LICENSE.txt. Original geometry and colormap retained.
+Adapted scale, placement, and procedural floating/path animation.

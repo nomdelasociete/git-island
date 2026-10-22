@@ -99,10 +99,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
         configureAuthenticatedExperience()
         let store = GitIslandStore.shared
-        // @Published emits every assignment, including true -> true. Do not
-        // deduplicate: another 401 must reopen recovery after the user closes it.
+        // Recovery may appear automatically until dismissed. After that,
+        // the user can reopen setup from the menu without being interrupted.
         store.$githubAuthorizationRequired.filter { $0 }
-            .receive(on: RunLoop.main).sink { [weak self] _ in self?.showOnboarding() }
+            .receive(on: RunLoop.main).sink { [weak self] _ in self?.showOnboardingAutomatically() }
             .store(in: &connectionObservations)
         store.$isAuthenticated.removeDuplicates().filter { $0 }
             .receive(on: RunLoop.main).sink { [weak self] _ in self?.presentIsland() }
@@ -157,6 +157,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    private func showOnboardingAutomatically() {
+        onboardingController.present(store: GitIslandStore.shared, automatically: true) { [weak self] in
+            self?.onboardingDidComplete()
+        }
+    }
+
     func showSettings() {
         settingsController.present(store: GitIslandStore.shared, onSignIn: showOnboarding)
     }
@@ -167,9 +173,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if store.isAuthenticated {
             presentIsland()
             store.startAutoRefresh()
-            if !UserDefaults.standard.bool(forKey: "onboardingCompleted") { showOnboarding() }
+            if !UserDefaults.standard.bool(forKey: "onboardingCompleted") { showOnboardingAutomatically() }
         } else {
-            showOnboarding()
+            showOnboardingAutomatically()
         }
     }
 
@@ -208,7 +214,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate {
     func onboardingDidComplete() {
-        onboardingController.dismiss()
         presentIsland()
         GitIslandStore.shared.startAutoRefresh()
     }
