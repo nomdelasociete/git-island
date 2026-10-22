@@ -78,7 +78,13 @@ is managed by the deployment. No runtime bindings or application secrets are use
 Use `npx --no-install cf deploy --dry-run` to validate first. To publish that exact build, use
 `npx --no-install cf deploy --prebuilt --mode production`. Generated `.cloudflare/` and
 `.wrangler/` directories are ignored. Unknown paths return 404. Deployment is
-manual; repository CI builds the site but does not publish it.
+automatic after successful CI on pushes to `main` that change the website or
+its deployment configuration. The production environment accepts only `main`.
+The scoped `CLOUDFLARE_API_TOKEN` GitHub Actions secret is exposed only to the
+production deployment step, never to pull-request builds. The first production
+run publishes a baseline. Later runs compare against the last successful
+`website-production` deployment, preserving changes across failed or queued runs.
+App-only changes skip publishing; manual CLI deployment remains available.
 
 Social sharing uses static Open Graph and Twitter card metadata in `index.html`
 and the 1200 × 630 `public/social-preview-v1.png` image, rendered from the actual

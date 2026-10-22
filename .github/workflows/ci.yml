@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 jobs:
   build-and-test:
@@ -99,6 +99,52 @@ jobs:
           echo "$tools_dir" >> "$GITHUB_PATH"
       - name: Scan history without printing findings
         run: bash script/check-secrets.sh
+      - name: Test deployment change detection
+        run: python3 -m unittest discover -s Tests/Deployment
       - name: Check shell syntax
         run: |
           for file in script/*.sh; do bash -n "$file"; done
+
+  deploy-website:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build-and-test, website, secrets]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: website-production
+      url: https://gitis.land
+    permissions:
+      contents: read
+      deployments: read
+    concurrency:
+      group: website-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Detect unpublished website changes
+        id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 script/website_deploy_needed.py >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        if: steps.changes.outputs.changed == 'true'
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Install locked deployment tooling
+        if: steps.changes.outputs.changed == 'true'
+        working-directory: website
+        run: npm ci
+      - name: Deploy website
+        if: steps.changes.outputs.changed == 'true'
+        working-directory: website
+        env:
+          CLOUDFLARE_ACCOUNT_ID: 0a0c8c3111c01831f0604c9ad662706b
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Missing CLOUDFLARE_API_TOKEN'; exit 1; }
+          npm run deploy
