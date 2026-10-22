@@ -24,7 +24,15 @@ func text(_ value: String, x: CGFloat, y: CGFloat, size: CGFloat, weight: NSFont
 if let logo = NSImage(contentsOf: root.appendingPathComponent("Assets/git-island-logo.png")) {
     logo.draw(in: NSRect(x: 42, y: 417, width: 30, height: 30))
 }
-text("git island.", x: 82, y: 421, size: 19, weight: .bold)
+let wordFont = NSFont.systemFont(ofSize: 19, weight: .bold)
+let word = "git island" as NSString
+let wordWidth = word.size(withAttributes: [.font: wordFont]).width
+word.draw(at: NSPoint(x: 82, y: 421), withAttributes: [.font: wordFont, .foregroundColor: pine])
+// Site wordmark uses a moss dot, pulled slightly into the word.
+("." as NSString).draw(at: NSPoint(x: 82 + wordWidth - 3, y: 421), withAttributes: [
+    .font: wordFont,
+    .foregroundColor: NSColor(srgbRed: 62.0/255, green: 139.0/255, blue: 106.0/255, alpha: 1)
+])
 text("Your island is one drag away.", x: 42, y: 352, size: 31, weight: .semibold)
 text("Drag Git Island into Applications. Then open it from there.", x: 43, y: 323, size: 13, alpha: 0.72)
 // A quiet directional cue between the actual Finder icons.
