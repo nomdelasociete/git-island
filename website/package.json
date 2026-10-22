@@ -20,5 +20,8 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.64.0",
     "cf": "0.15.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
   }
 }

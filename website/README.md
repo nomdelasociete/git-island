@@ -9,7 +9,7 @@ The inbox contains fictional fixtures and makes no GitHub API requests.
 
 ## Run
 
-Requires Node.js 22.12+ (validated with Node.js 24).
+Requires Node.js 22.18+ (validated with Node.js 24).
 
 ```sh
 cd website
