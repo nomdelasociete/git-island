@@ -81,35 +81,6 @@ actor GitHubPullRequestService {
         }
     }
 
-    func fetchRepositories() async throws -> [String] {
-        let token = try tokenProvider.token()
-        var repositories: [GitHubRepository] = []
-        var page = 1
-
-        while true {
-            var components = URLComponents(string: "https://api.github.com/user/repos")!
-            components.queryItems = [
-                URLQueryItem(name: "affiliation", value: "owner,collaborator,organization_member"),
-                URLQueryItem(name: "visibility", value: "all"),
-                URLQueryItem(name: "sort", value: "full_name"),
-                URLQueryItem(name: "direction", value: "asc"),
-                URLQueryItem(name: "per_page", value: "100"),
-                URLQueryItem(name: "page", value: String(page))
-            ]
-
-            let (pageRepositories, _): ([GitHubRepository], String?) = try await client.get(components.url!, token: token)
-            repositories.append(contentsOf: pageRepositories.filter { $0.archived != true })
-
-            guard pageRepositories.count == 100 else {
-                break
-            }
-
-            page += 1
-        }
-
-        return Self.normalizedRepositoryFullNames(repositories.map(\.fullName))
-    }
-
     /// Performs a GET with ETag conditional support. On 304 returns the previously cached value (if any).
     /// Updates caches on success. Falls back to unconditional fetch if no cache hit on 304.
     func getWithETag<T: Decodable>(_ url: URL, token: String) async throws -> T {

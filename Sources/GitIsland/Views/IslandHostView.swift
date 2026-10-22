@@ -496,6 +496,20 @@ private struct PullRequestActionRow: View {
         .onDisappear {
             confirmationResetTask?.cancel()
         }
+        .contextMenu {
+            Button("Hide until it changes") {
+                store.hidePullRequest(pullRequest)
+            }
+            Button("Mute repository") {
+                store.muteRepository(pullRequest.repositoryFullName)
+            }
+        }
+        .accessibilityAction(named: Text("Hide until it changes")) {
+            store.hidePullRequest(pullRequest)
+        }
+        .accessibilityAction(named: Text("Mute repository")) {
+            store.muteRepository(pullRequest.repositoryFullName)
+        }
     }
 
     private var pullRequestLinkButton: some View {
@@ -514,8 +528,16 @@ private struct PullRequestActionRow: View {
         }
         .buttonStyle(IslandContentButtonStyle())
         .frame(maxWidth: .infinity, alignment: .leading)
-        .help("\(pullRequest.title)\n\(pullRequest.repositoryFullName) #\(pullRequest.number)\n\(pullRequest.reason) · \(pullRequest.age)")
+        .help("\(pullRequest.title)\n\(pullRequest.repositoryFullName) #\(pullRequest.number)\n\(pullRequest.reason) · \(pullRequest.age)\nRight-click to hide this pull request or mute its repository.")
         .accessibilityAddTraits(.isLink)
+        .contextMenu {
+            Button("Hide until it changes") {
+                store.hidePullRequest(pullRequest)
+            }
+            Button("Mute repository") {
+                store.muteRepository(pullRequest.repositoryFullName)
+            }
+        }
     }
 
     private var pullRequestText: some View {

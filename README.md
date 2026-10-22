@@ -41,7 +41,7 @@ Sign in using GitHub’s device flow. The OAuth client ID is public; no client
 secret belongs in the app. The grant requests `read:user repo`: **broad repository
 access, including private repositories and write capabilities**. The app uses
 writes for actions you explicitly choose, such as merging or updating a branch.
-Selecting repositories in Settings limits queries, not the token’s permissions.
+A typed allowlist in Settings limits search queries. Muting a repository or hiding a pull request only filters the inbox on this Mac. Neither changes the token’s permissions.
 
 For development, `GITHUB_TOKEN`, `GH_TOKEN`, and `GITHUB_OAUTH_CLIENT_ID` are
 Debug-only settings. Tokens are fallbacks when no stored credential exists. Use your own test account and credentials; never put them

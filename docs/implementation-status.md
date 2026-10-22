@@ -85,9 +85,13 @@
 - Settings expose refresh diagnostics: in-flight state, reason, last
   start/finish, duration, next scheduled refresh, last message, and copyable
   debug text.
-- Settings can scope GitHub data to all repositories or to a saved subset of
-  `owner/repository` names. Selected repository mode scopes GitHub search
-  queries with `repo:` qualifiers instead of filtering only after fetch.
+- Settings scopes the inbox to every authored and review-requested pull
+  request, or to a typed list of `owner/repository` names. Selected mode adds
+  `repo:` qualifiers to GitHub search. All mode keeps that search unscoped.
+  Right-click a pull request to hide it until its group, head SHA, or reason
+  changes, or to mute its repository. Muted repositories are dropped after
+  fetch. Settings lists the typed allowlist, muted repositories, and hidden
+  pull requests.
 - Settings is a sidebar window (General, Appearance, Sounds, Refresh,
   Repositories). Appearance has a live outline preview and lets the user set
   lane width, spacing, and the lane limit before lanes fuse.
@@ -111,12 +115,14 @@
 - SwiftPM regression tests cover the known GitHub PR classification states.
 
 ## What is intentionally not done yet
-- No full GitHub repository browser. Repository selection is manual plus repos
-  discovered from currently loaded PRs.
+- No membership repository browser. The app does not list every repository
+  the account can access. Exclusion is mute-by-repository and hide-by-pull-request.
 - No exact private GitHub PR Inbox API integration. GitHub does not expose this
   new inbox surface as a stable public API, so the current behavior mirrors it
   through documented search qualifiers.
-- Repository selection is persisted in UserDefaults; visible-group selection is transient.
+- Repository allowlist, muted repositories, and hidden pull-request signatures
+  are persisted in UserDefaults. Visible-group selection is transient. Sign-out
+  clears the allowlist, mutes, and hidden pull requests.
 - Idle auto-refresh interval preference is saved in UserDefaults.
 - No Sparkle updater or self-managed release artifact. TestFlight/App Store
   Connect is the prepared distribution path.

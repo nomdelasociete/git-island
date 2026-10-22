@@ -24,9 +24,6 @@ struct SettingsView: View {
                 .navigationTitle(selection.title)
         }
         .frame(minWidth: 720, minHeight: 500)
-        .task {
-            store.loadAvailableRepositories()
-        }
     }
 
     @ViewBuilder
@@ -861,7 +858,6 @@ private struct RefreshSettingsPane: View {
 private struct RepositorySettingsPane: View {
     @ObservedObject var store: GitIslandStore
     @State private var repositoryInput = ""
-    @State private var searchText = ""
 
     private var modeSelection: Binding<RepositoryFilterMode> {
         Binding(
@@ -877,12 +873,6 @@ private struct RepositorySettingsPane: View {
     private var canAddRepositoryInput: Bool {
         guard let normalizedRepositoryInput else { return false }
         return !store.isRepositorySelected(normalizedRepositoryInput)
-    }
-
-    private var filteredRepositories: [String] {
-        let query = searchText.trimmingCharacters(in: .whitespaces).lowercased()
-        guard !query.isEmpty else { return store.repositoryFilterCandidates }
-        return store.repositoryFilterCandidates.filter { $0.contains(query) }
     }
 
     var body: some View {
@@ -914,65 +904,81 @@ private struct RepositorySettingsPane: View {
                         .disabled(!canAddRepositoryInput)
                     }
                     .disabled(!store.isAuthenticated)
+
+                    if store.selectedRepositoryFullNames.isEmpty {
+                        Text("No repositories selected")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(store.selectedRepositoryFullNames, id: \.self) { repositoryFullName in
+                            namedRow(repositoryFullName, actionTitle: "Remove") {
+                                store.removeSelectedRepository(repositoryFullName)
+                            }
+                        }
+                    }
                 } header: {
-                    Text("Add by name")
+                    Text("Selected")
+                } footer: {
+                    Text("GitHub search includes only these repositories.")
+                        .foregroundStyle(.secondary)
                 }
             }
 
             Section {
-                if !store.repositoryFilterCandidates.isEmpty {
-                    TextField("Filter", text: $searchText, prompt: Text("Filter repositories"))
-                        .textFieldStyle(.roundedBorder)
-
-                    ForEach(filteredRepositories, id: \.self) { repositoryFullName in
-                        repositoryRow(repositoryFullName)
-                    }
-                } else {
-                    Text(store.repositoryListStatus)
+                if store.mutedRepositoryFullNames.isEmpty {
+                    Text("No muted repositories")
                         .foregroundStyle(.secondary)
+                } else {
+                    ForEach(store.mutedRepositoryFullNames, id: \.self) { repositoryFullName in
+                        namedRow(repositoryFullName, actionTitle: "Unmute") {
+                            store.unmuteRepository(repositoryFullName)
+                        }
+                    }
                 }
             } header: {
-                HStack {
-                    Text("Repositories")
-                    Spacer()
-                    Button(store.isLoadingRepositories ? "Loading…" : "Reload") {
-                        store.loadAvailableRepositories(force: true)
-                    }
-                    .controlSize(.small)
-                    .disabled(!store.isAuthenticated || store.isLoadingRepositories)
-                }
+                Text("Muted")
             } footer: {
-                Text(store.repositoryListStatus)
+                Text("Right-click a pull request to mute its repository. Muted repositories stay out of the inbox.")
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                if store.hiddenPullRequests.isEmpty {
+                    Text("No hidden pull requests")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(store.hiddenPullRequests) { pullRequest in
+                        HStack(spacing: 8) {
+                            Text("\(pullRequest.repositoryFullName) #\(pullRequest.number)")
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                            Spacer(minLength: 0)
+                            Button("Show") {
+                                store.showHiddenPullRequest(id: pullRequest.id)
+                            }
+                            .disabled(!store.isAuthenticated)
+                        }
+                    }
+                }
+            } header: {
+                Text("Hidden")
+            } footer: {
+                Text("Right-click a pull request to hide it. It comes back when its status, head, or reason changes.")
                     .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
     }
 
-    @ViewBuilder
-    private func repositoryRow(_ repositoryFullName: String) -> some View {
-        if store.repositoryFilterMode == .selected {
-            Toggle(
-                isOn: Binding(
-                    get: { store.isRepositorySelected(repositoryFullName) },
-                    set: { isSelected in
-                        if isSelected {
-                            store.addSelectedRepository(repositoryFullName)
-                        } else {
-                            store.removeSelectedRepository(repositoryFullName)
-                        }
-                    }
-                )
-            ) {
-                repositoryLabel(repositoryFullName)
-            }
-        } else {
-            HStack(spacing: 8) {
-                repositoryLabel(repositoryFullName)
-                Spacer(minLength: 0)
-                Image(systemName: "checkmark")
-                    .foregroundStyle(.secondary)
-            }
+    private func namedRow(
+        _ repositoryFullName: String,
+        actionTitle: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        HStack(spacing: 8) {
+            repositoryLabel(repositoryFullName)
+            Spacer(minLength: 0)
+            Button(actionTitle, action: action)
+                .disabled(!store.isAuthenticated)
         }
     }
 
