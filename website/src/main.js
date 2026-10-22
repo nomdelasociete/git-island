@@ -782,7 +782,7 @@ function frame(time) {
     notchBeat = "wait";
     userTookIsland = false;
     openInbox(false);
-  } else if (!reduce.matches && notchBeat === "wait" && demo > 0.4) {
+  } else if (!reduce.matches && notchBeat === "wait" && demo >= 0.95) {
     notchBeat = "open";
     notchOpenedAt = time;
     filter = "all";
