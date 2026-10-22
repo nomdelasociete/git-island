@@ -9,7 +9,7 @@ The inbox contains fictional fixtures and makes no GitHub API requests.
 
 ## Run
 
-Requires Node.js 22.12+ (validated with Node.js 24).
+Requires Node.js 22.18+ (validated with Node.js 24).
 
 ```sh
 cd website
@@ -32,8 +32,7 @@ The browser UI follows `IslandDesignSystem.swift` and `IslandHostView.swift`: na
 colors, 68-point rows, five-row viewport, summary counts, notch-adjacent counters,
 segmented outline, hover selection and 280 ms pointer-leave collapse. It uses
 web equivalents for system symbols and glass buttons, not a native app capture.
-Merge/Confirm operates only on fictional in-memory fixtures, never GitHub. Publishing or DNS
-configuration is separate work.
+Merge/Confirm operates only on fictional in-memory fixtures, never GitHub. The public site is deployed to https://gitis.land on Cloudflare Workers static assets.
 
 ## Design
 
@@ -61,3 +60,28 @@ on physical mobile devices, browser coverage, asset/font hosting, and deployment
 The decorative menu bar and numbered chapter controls are removed. The sailboat uses a shallow, stable draft, gentle roll, tangent-aligned travel
 and water-shader wakes. The whale surfaces every 16 seconds with a timed
 droplet splash and expanding water ripples; pause and reduced motion apply.
+
+## Deploy
+
+The pinned `cf` CLI deploys to the NOM DE LA SOCIETE account selected explicitly
+in `cloudflare.config.ts`. From `website/`, install the pinned tooling with
+`npm ci`, authenticate with `npx --no-install cf auth login`, then run
+`npm run deploy`. Before any Cloudflare build or deployment, run
+`unset CLOUDFLARE_ACCOUNT_ID` so the checked-in account selection takes effect.
+The CLI gives that environment variable precedence over the configuration; if
+retaining it intentionally, it must equal `0a0c8c3111c01831f0604c9ad662706b`
+(NOM DE LA SOCIETE). Do not deploy with an account override from another project.
+The Vite plugin generates Cloudflare Build
+Output; only generated static assets are uploaded. The `gitis.land` custom domain
+is managed by the deployment. No runtime bindings or application secrets are used.
+
+Use `npx --no-install cf deploy --dry-run` to validate first. To publish that exact build, use
+`npx --no-install cf deploy --prebuilt --mode production`. Generated `.cloudflare/` and
+`.wrangler/` directories are ignored. Unknown paths return 404. Deployment is
+manual; repository CI builds the site but does not publish it.
+
+Social sharing uses static Open Graph and Twitter card metadata in `index.html`
+and the 1200 × 630 `public/social-preview-v1.png` image, rendered from the actual
+website scene with navigation controls hidden. The scene model credits in
+`public/models/ATTRIBUTION.txt` also apply to this render. Version the image URL
+when replacing it so social crawlers can retrieve the new asset.

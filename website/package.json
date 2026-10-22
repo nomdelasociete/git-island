@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "preview": "vite preview --host 127.0.0.1"
+    "preview": "vite preview --host 127.0.0.1",
+    "deploy": "cf deploy"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +16,12 @@
     "three": "^0.186.1",
     "vite": "^8.3.5"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.64.0",
+    "cf": "0.15.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
 }
