@@ -66,7 +66,12 @@ droplet splash and expanding water ripples; pause and reduced motion apply.
 The pinned `cf` CLI deploys to the NOM DE LA SOCIETE account selected explicitly
 in `cloudflare.config.ts`. From `website/`, install the pinned tooling with
 `npm ci`, authenticate with `npx --no-install cf auth login`, then run
-`npm run deploy`. The Vite plugin generates Cloudflare Build
+`npm run deploy`. Before any Cloudflare build or deployment, run
+`unset CLOUDFLARE_ACCOUNT_ID` so the checked-in account selection takes effect.
+The CLI gives that environment variable precedence over the configuration; if
+retaining it intentionally, it must equal `0a0c8c3111c01831f0604c9ad662706b`
+(NOM DE LA SOCIETE). Do not deploy with an account override from another project.
+The Vite plugin generates Cloudflare Build
 Output; only generated static assets are uploaded. The `gitis.land` custom domain
 is managed by the deployment. No runtime bindings or application secrets are used.
 
