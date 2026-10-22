@@ -9,6 +9,14 @@ const $ = (s) => document.querySelector(s),
   desktop = $(".desktop");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)"),
   clamp = T.MathUtils.clamp;
+// ponytail: reveal waits on Draco decode of macbook-pro.glb. Shrink that
+// file if the spinner stays up; don't add a second loader.
+const macbookBytes = fetch("/models/macbook-pro.glb").then((response) => {
+  if (!response.ok) throw new Error("Mac model " + response.status);
+  return response.arrayBuffer();
+});
+const macDecoder = new DRACOLoader().setDecoderPath("/draco/");
+const macDecoderReady = macDecoder.preload();
 const smooth = (a, b, v) => {
   const t = clamp((v - a) / (b - a), 0, 1);
   return t * t * (3 - 2 * t);
@@ -90,7 +98,10 @@ prs.push(
 );
 let changedPR = null;
 let expanded = false,
-  filter = "all";
+  filter = "all",
+  notchBeat = "wait",
+  notchOpenedAt = 0,
+  userTookIsland = false;
 // Values mirror IslandDesignSystem.swift and PullRequestGroup.tint.
 const statusColors = {
   ready: "#6ed18f",
@@ -196,8 +207,6 @@ $("#pr-list").addEventListener("click", (e) => {
     1,
   );
   confirming = null;
-  $("#activity-note").textContent =
-    `Demo only: #${id} merged. No GitHub request sent.`;
   renderInbox();
 });
 function openInbox(value = true) {
@@ -217,6 +226,7 @@ function openInbox(value = true) {
   );
 }
 $(".notch-toggle").addEventListener("click", () => {
+  userTookIsland = true;
   filter = "all";
   renderInbox();
   openInbox(!expanded);
@@ -229,17 +239,15 @@ $(".notch-toggle").addEventListener("mouseenter", () => {
   }
 });
 $("#try-demo").addEventListener("click", () => {
+  userTookIsland = true;
   filter = "all";
   renderInbox();
   openInbox();
   $(".notch-toggle").focus({ preventScroll: true });
 });
-$("#collapse").addEventListener("click", () => {
-  openInbox(false);
-  $(".notch-toggle").focus({ preventScroll: true });
-});
 document.querySelectorAll("[data-filter]").forEach((b) =>
   b.addEventListener("click", () => {
+    userTookIsland = true;
     const same = expanded && filter === b.dataset.filter;
     filter = b.dataset.filter;
     renderInbox();
@@ -249,18 +257,15 @@ document.querySelectorAll("[data-filter]").forEach((b) =>
 desktop.addEventListener("click", (e) => {
   if (
     !e.composedPath().includes($(".island-app")) &&
-    !e.target.closest("#try-demo, .demo-controls")
+    !e.target.closest("#try-demo")
   )
     openInbox(false);
 });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") openInbox(false);
 });
-let motionPaused = false,
-  activityPaused = reduce.matches,
-  activityTime = 0,
-  eventIndex = 0,
-  demoOpened = false;
+let activityTime = 0,
+  eventIndex = 0;
 const events = [
   [19, "ready", "Checks passed"],
   [47, "testing", "Fix pushed · checking"],
@@ -271,33 +276,10 @@ const events = [
   [41, "waiting", "Your review"],
   [49, "testing", "Fix pushed · checking"],
 ];
-$("#pause-motion").addEventListener("click", () => {
-  motionPaused = !motionPaused;
-  $("#pause-motion").textContent = motionPaused
-    ? "Resume motion"
-    : "Pause motion";
-  $("#pause-motion").setAttribute("aria-pressed", String(motionPaused));
-  document.body.classList.toggle("motion-paused", motionPaused);
-});
-function updatePause() {
-  $("#pause-activity").textContent = activityPaused
-    ? "Resume activity"
-    : "Pause activity";
-  $("#pause-activity").setAttribute("aria-pressed", String(activityPaused));
-}
-$("#pause-activity").addEventListener("click", () => {
-  activityPaused = !activityPaused;
-  activityTime = 0;
-  updatePause();
-});
-reduce.addEventListener("change", () => {
-  activityPaused = reduce.matches;
-  updatePause();
-});
-updatePause();
 let leaveTimer;
 $(".island-app").addEventListener("mouseenter", () => clearTimeout(leaveTimer));
 $(".island-app").addEventListener("mouseleave", () => {
+  if (notchBeat === "open" && !userTookIsland) return;
   leaveTimer = setTimeout(() => openInbox(false), 280);
 });
 document.querySelectorAll("[data-filter]").forEach((b) =>
@@ -404,10 +386,15 @@ function wallpaper() {
 }
 const sharedWallpaper = wallpaper();
 function makeDevice(parent) {
-  const decoder = new DRACOLoader().setDecoderPath("/draco/");
-  new GLTFLoader().setDRACOLoader(decoder).load(
-    "/models/macbook-pro.glb",
-    ({ scene: model }) => {
+  const loader = new GLTFLoader().setDRACOLoader(macDecoder);
+  Promise.all([macbookBytes, macDecoderReady])
+    .then(
+      ([buffer]) =>
+        new Promise((resolve, reject) => {
+          loader.parse(buffer, "/models/", resolve, reject);
+        }),
+    )
+    .then(({ scene: model }) => {
       const bounds = new T.Box3().setFromObject(model),
         size = bounds.getSize(new T.Vector3());
       const scale = 3.9 / size.x;
@@ -437,14 +424,12 @@ function makeDevice(parent) {
         });
       }
       document.body.dataset.model = "loaded";
-      decoder.dispose();
-    },
-    undefined,
-    () => {
+      macDecoder.dispose();
+    })
+    .catch(() => {
       document.body.dataset.model = "failed";
-      decoder.dispose();
-    },
-  );
+      macDecoder.dispose();
+    });
 }
 const seaActors = [];
 const waterContacts = {
@@ -764,13 +749,12 @@ addEventListener("resize", () => {
 });
 reduce.addEventListener("change", updateScroll);
 updateScroll();
-let handoffTime = 0;
 function frame(time) {
   requestAnimationFrame(frame);
   const dt = Math.min((time - lastTime) / 1000, 0.15);
   lastTime = time;
   if (document.hidden) return;
-  elapsed += reduce.matches || motionPaused ? 0 : dt;
+  elapsed += reduce.matches ? 0 : dt;
   currentP +=
     (targetP - currentP) * (reduce.matches ? 1 : 1 - Math.exp(-dt * 9));
   const p = currentP,
@@ -781,12 +765,11 @@ function frame(time) {
   $(".intro").inert = op < 0.1;
   $(".device-copy").style.opacity =
     smooth(0.25, 0.37, p) * (1 - smooth(0.53, 0.66, p));
-  const demo = reduce.matches ? 1 : smooth(0.845, 0.89, p);
+  const demo = reduce.matches ? 1 : smooth(0.74, 0.82, p);
   desktop.style.opacity = demo;
   desktop.style.visibility = demo > 0.001 ? "visible" : "hidden";
   desktop.inert = demo < 0.95;
-  const controls = reduce.matches ? 1 : smooth(0.885, 0.91, p);
-  desktop.style.setProperty("--controls-opacity", controls);
+  const controls = reduce.matches ? 1 : smooth(0.9, 0.96, p);
   const displayHeight = Math.min(2.446, 3.779 / (innerWidth / innerHeight));
   const notchScale =
     (0.406 * innerHeight) / displayHeight / (mobile ? 145 : 210);
@@ -795,19 +778,28 @@ function frame(time) {
     T.MathUtils.lerp(notchScale, 1, controls),
   );
   $(".vignette").style.opacity = 1 - smooth(0.67, 0.83, p);
-  handoffTime = demo === 1 ? handoffTime + dt : 0;
-  if (p < 0.75 && demoOpened) {
+  if (p < 0.68 && notchBeat !== "wait") {
+    notchBeat = "wait";
+    userTookIsland = false;
     openInbox(false);
-    demoOpened = false;
-  }
-  if (demo === 1 && (reduce.matches || handoffTime > 0.65) && !demoOpened) {
-    demoOpened = true;
+  } else if (!reduce.matches && notchBeat === "wait" && demo >= 0.95) {
+    notchBeat = "open";
+    notchOpenedAt = time;
+    filter = "all";
+    renderInbox();
+    openInbox(true);
+  } else if (
+    notchBeat === "open" &&
+    !userTookIsland &&
+    time - notchOpenedAt > 2400
+  ) {
+    openInbox(false);
+    notchBeat = "done";
   }
   if (
     demo > 0.95 &&
     expanded &&
-    !activityPaused &&
-    !motionPaused &&
+    !reduce.matches &&
     scrollY <= destination(1)
   ) {
     activityTime += dt;
@@ -818,7 +810,6 @@ function frame(time) {
       if (changed) Object.assign(changed, { state, label });
       changedPR = id;
       renderInbox();
-      $("#activity-note").textContent = `#${id} · ${label}`;
     }
   }
   stage.classList.toggle("in-demo", demo > 0.5 && scrollY <= destination(1));
@@ -844,14 +835,14 @@ function frame(time) {
   const close = closeLook.clone().addScaledVector(screenNormal, coverDistance);
   camera.up
     .set(0, 1, 0)
-    .lerp(new T.Vector3(0, 0.94, -0.342).normalize(), smooth(0.48, 0.83, p));
+    .lerp(new T.Vector3(0, 0.94, -0.342).normalize(), smooth(0.48, 0.7, p));
   let aim;
   if (p < 0.48) {
     const t = smooth(0.03, 0.48, p);
     camera.position.copy(wide).lerp(mid, t);
     aim = look.lerp(midLook, t);
   } else {
-    const t = smooth(0.48, 0.83, p);
+    const t = smooth(0.48, 0.7, p);
     camera.position.copy(mid).lerp(close, t);
     aim = midLook.lerp(closeLook, t);
   }
