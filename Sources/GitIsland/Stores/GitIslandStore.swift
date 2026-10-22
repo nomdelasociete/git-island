@@ -31,9 +31,8 @@ final class GitIslandStore: ObservableObject {
     @Published private(set) var eventSounds = UserPreferences.eventSounds
     @Published private(set) var outlineLaneStyle = UserPreferences.outlineLaneStyle
     @Published private(set) var selectedRepositoryFullNames = UserPreferences.selectedRepositoryFullNames
-    @Published private(set) var availableRepositoryFullNames: [String] = []
-    @Published private(set) var isLoadingRepositories = false
-    @Published private(set) var repositoryListError: String?
+    @Published private(set) var mutedRepositoryFullNames = UserPreferences.mutedRepositoryFullNames
+    @Published private(set) var hiddenPullRequests = UserPreferences.hiddenPullRequests
     @Published private(set) var refreshDiagnostics = RefreshDiagnostics()
 
 #if DEBUG
@@ -48,8 +47,6 @@ final class GitIslandStore: ObservableObject {
     private var accountGeneration = UUID()
     private var refreshTask: Task<Void, Never>?
     private var refreshRequestID: UUID?
-    private var repositoryListTask: Task<Void, Never>?
-    private var repositoryListRequestID: UUID?
     @Published private(set) var relayConnectionState: RelayConnectionState = .inactive
     var relayConnected: Bool { relayConnectionState == .connected }
     var hasRelayConfiguration: Bool {
@@ -322,41 +319,12 @@ final class GitIslandStore: ObservableObject {
     var repositoryScopeStatus: String {
         switch repositoryFilterMode {
         case .all:
-            return "All repositories"
+            let mutedCount = mutedRepositoryFullNames.count
+            return mutedCount == 0 ? "All repositories" : "All repositories, \(mutedCount) muted"
         case .selected:
             let count = selectedRepositoryFullNames.count
             return count == 0 ? "No repositories selected" : "\(count) selected"
         }
-    }
-
-    var repositoryListStatus: String {
-        if !isAuthenticated {
-            return "Sign in required"
-        }
-
-        if isLoadingRepositories {
-            return "Loading repositories"
-        }
-
-        if let repositoryListError {
-            return repositoryListError
-        }
-
-        if availableRepositoryFullNames.isEmpty {
-            return "No repositories loaded"
-        }
-
-        return "\(availableRepositoryFullNames.count) available"
-    }
-
-    var repositoryFilterCandidates: [String] {
-        Array(
-            Set(
-                selectedRepositoryFullNames
-                    + availableRepositoryFullNames
-                    + pullRequests.map { $0.repositoryFullName.lowercased() }
-            )
-        ).sorted()
     }
 
     var counterCounts: [PullRequestGroup: Int] {
@@ -714,9 +682,6 @@ final class GitIslandStore: ObservableObject {
         isAuthenticated = true
         Task {
             await loadGitHubIdentity(token: token)
-            await MainActor.run {
-                self.loadAvailableRepositories()
-            }
         }
     }
 
@@ -746,7 +711,6 @@ final class GitIslandStore: ObservableObject {
         let signedInGeneration = accountGeneration
         await loadGitHubIdentity(token: token)
         guard signedInGeneration == accountGeneration, isAuthenticated else { return }
-        loadAvailableRepositories(force: true)
         startAutoRefresh()
     }
 
@@ -754,7 +718,6 @@ final class GitIslandStore: ObservableObject {
         accountGeneration = UUID()
         service = GitHubPullRequestService()
         stopAutoRefresh()
-        repositoryListTask?.cancel()
         do {
             try TokenStore.delete()
             credentialStorageError = nil
@@ -765,16 +728,15 @@ final class GitIslandStore: ObservableObject {
         githubLogin = nil
         pullRequests = []
         updatingBranchPullRequestIDs = []
-        availableRepositoryFullNames = []
         selectedRepositoryFullNames = []
         UserPreferences.selectedRepositoryFullNames = []
+        mutedRepositoryFullNames = []
+        UserPreferences.mutedRepositoryFullNames = []
+        hiddenPullRequests = []
+        UserPreferences.hiddenPullRequests = []
         repositoryFilterMode = .all
         UserPreferences.repositoryFilterMode = .all
         mergingPullRequestIDs = []
-        isLoadingRepositories = false
-        repositoryListError = nil
-        repositoryListTask = nil
-        repositoryListRequestID = nil
         showsAllPullRequests = false
         locallyHiddenPullRequestIDs = []
         optimisticMergeBackups = [:]
@@ -867,23 +829,92 @@ final class GitIslandStore: ObservableObject {
     }
 
     func addSelectedRepository(_ fullName: String) {
-        guard let normalized = UserPreferences.normalizedRepositoryFullName(fullName),
-              !selectedRepositoryFullNames.contains(normalized)
-        else {
+        guard let normalized = UserPreferences.normalizedRepositoryFullName(fullName) else {
             return
         }
 
-        selectedRepositoryFullNames.append(normalized)
-        selectedRepositoryFullNames.sort()
-        UserPreferences.selectedRepositoryFullNames = selectedRepositoryFullNames
+        var changed = false
+        if mutedRepositoryFullNames.contains(normalized) {
+            mutedRepositoryFullNames.removeAll { $0 == normalized }
+            UserPreferences.mutedRepositoryFullNames = mutedRepositoryFullNames
+            changed = true
+        }
+
+        if !selectedRepositoryFullNames.contains(normalized) {
+            selectedRepositoryFullNames.append(normalized)
+            selectedRepositoryFullNames.sort()
+            UserPreferences.selectedRepositoryFullNames = selectedRepositoryFullNames
+            changed = true
+        }
 
         if repositoryFilterMode != .selected {
             repositoryFilterMode = .selected
             UserPreferences.repositoryFilterMode = .selected
-            applyRepositoryFilterToLoadedPullRequests()
+            changed = true
         }
 
+        guard changed else {
+            return
+        }
+
+        applyRepositoryFilterToLoadedPullRequests()
         refreshAfterRepositoryScopeChange()
+    }
+
+    func muteRepository(_ fullName: String) {
+        guard let normalized = UserPreferences.normalizedRepositoryFullName(fullName) else {
+            return
+        }
+
+        if !mutedRepositoryFullNames.contains(normalized) {
+            mutedRepositoryFullNames.append(normalized)
+            mutedRepositoryFullNames.sort()
+            UserPreferences.mutedRepositoryFullNames = mutedRepositoryFullNames
+        }
+
+        if selectedRepositoryFullNames.contains(normalized) {
+            selectedRepositoryFullNames.removeAll { $0 == normalized }
+            UserPreferences.selectedRepositoryFullNames = selectedRepositoryFullNames
+        }
+
+        applyRepositoryFilterToLoadedPullRequests()
+    }
+
+    func unmuteRepository(_ fullName: String) {
+        guard let normalized = UserPreferences.normalizedRepositoryFullName(fullName),
+              mutedRepositoryFullNames.contains(normalized)
+        else {
+            return
+        }
+
+        mutedRepositoryFullNames.removeAll { $0 == normalized }
+        UserPreferences.mutedRepositoryFullNames = mutedRepositoryFullNames
+        guard isAuthenticated else {
+            return
+        }
+        refresh(force: true, reason: .repositoryScope)
+    }
+
+    func hidePullRequest(_ pullRequest: PullRequest) {
+        hiddenPullRequests.removeAll { $0.id == pullRequest.id }
+        hiddenPullRequests.append(HiddenPullRequest(pullRequest: pullRequest))
+        UserPreferences.hiddenPullRequests = hiddenPullRequests
+        hiddenPullRequests = UserPreferences.hiddenPullRequests
+        applyRepositoryFilterToLoadedPullRequests()
+    }
+
+    func showHiddenPullRequest(id: Int) {
+        guard hiddenPullRequests.contains(where: { $0.id == id }) else {
+            return
+        }
+
+        hiddenPullRequests.removeAll { $0.id == id }
+        UserPreferences.hiddenPullRequests = hiddenPullRequests
+        hiddenPullRequests = UserPreferences.hiddenPullRequests
+        guard isAuthenticated else {
+            return
+        }
+        refresh(force: true, reason: .repositoryScope)
     }
 
     func removeSelectedRepository(_ fullName: String) {
@@ -895,73 +926,6 @@ final class GitIslandStore: ObservableObject {
         UserPreferences.selectedRepositoryFullNames = selectedRepositoryFullNames
         applyRepositoryFilterToLoadedPullRequests()
         refreshAfterRepositoryScopeChange()
-    }
-
-    func loadAvailableRepositories(force: Bool = false) {
-        guard isAuthenticated else {
-            repositoryListError = "Sign in required"
-            return
-        }
-
-        if !force, !availableRepositoryFullNames.isEmpty {
-            return
-        }
-
-        if isLoadingRepositories {
-            guard force else {
-                return
-            }
-            repositoryListTask?.cancel()
-        }
-
-        isLoadingRepositories = true
-        repositoryListError = nil
-        let requestID = UUID()
-        repositoryListRequestID = requestID
-
-        repositoryListTask = Task { [service] in
-            do {
-                let repositories = try await service.fetchRepositories()
-                try Task.checkCancellation()
-
-                await MainActor.run {
-                    guard self.repositoryListRequestID == requestID else {
-                        return
-                    }
-
-                    self.availableRepositoryFullNames = repositories
-                    self.isLoadingRepositories = false
-                    self.repositoryListError = nil
-                    self.repositoryListTask = nil
-                    self.repositoryListRequestID = nil
-                }
-            } catch is CancellationError {
-                await MainActor.run {
-                    guard self.repositoryListRequestID == requestID else {
-                        return
-                    }
-
-                    self.isLoadingRepositories = false
-                    self.repositoryListTask = nil
-                    self.repositoryListRequestID = nil
-                }
-            } catch {
-                await MainActor.run {
-                    guard self.repositoryListRequestID == requestID else {
-                        return
-                    }
-
-                    self.isLoadingRepositories = false
-                    if case .api(statusCode: 401, message: _, retryAfterDate: _) = error as? GitHubServiceError {
-                        self.signOut()
-                        self.githubAuthorizationRequired = true
-                    }
-                    self.repositoryListError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
-                    self.repositoryListTask = nil
-                    self.repositoryListRequestID = nil
-                }
-            }
-        }
     }
 
     func configureRelay(origin: String) throws {
@@ -1243,6 +1207,7 @@ final class GitIslandStore: ObservableObject {
                     }
 
                     let previousSignature = self.inboxSignature(from: self.pullRequests)
+                    self.reconcileHiddenPullRequests(with: pullRequests)
                     let visiblePullRequests = self.visiblePullRequests(from: pullRequests)
                     let nextSignature = self.inboxSignature(from: visiblePullRequests)
                     let arrivalPulse = self.arrivalPulse(for: visiblePullRequests)
@@ -1454,21 +1419,28 @@ final class GitIslandStore: ObservableObject {
     }
 
     private func visiblePullRequests(from fetchedPullRequests: [PullRequest]) -> [PullRequest] {
-        fetchedPullRequests.filter {
-            !locallyHiddenPullRequestIDs.contains($0.id) && repositoryIsInScope($0.repositoryFullName)
-        }
+        InboxFilter.visible(
+            fetchedPullRequests,
+            mode: repositoryFilterMode,
+            selectedRepositories: selectedRepositoryFullNames,
+            mutedRepositories: mutedRepositoryFullNames,
+            hiddenPullRequests: hiddenPullRequests,
+            suppressedIDs: locallyHiddenPullRequestIDs
+        )
     }
 
-    private func repositoryIsInScope(_ fullName: String) -> Bool {
-        guard repositoryFilterMode == .selected else {
-            return true
+    private func reconcileHiddenPullRequests(with fetchedPullRequests: [PullRequest]) {
+        let reconciled = InboxFilter.reconciledHiddenPullRequests(
+            hiddenPullRequests,
+            fetched: fetchedPullRequests
+        )
+        guard reconciled != hiddenPullRequests else {
+            return
         }
 
-        guard let normalized = UserPreferences.normalizedRepositoryFullName(fullName) else {
-            return false
-        }
-
-        return selectedRepositoryFullNames.contains(normalized)
+        hiddenPullRequests = reconciled
+        UserPreferences.hiddenPullRequests = reconciled
+        hiddenPullRequests = UserPreferences.hiddenPullRequests
     }
 
     private func applyRepositoryFilterToLoadedPullRequests() {

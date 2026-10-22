@@ -17,6 +17,7 @@
 		58F68872FEBC1498F0A55FAA /* IslandSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C9D8F38F289CB786E8AC52 /* IslandSound.swift */; };
 		61CE7B294D6CFCA208320DF6 /* GitIslandStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CB306328641020890C99F6 /* GitIslandStore.swift */; };
 		63ED7E0BFD3B60AA57463609 /* IslandPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E924AFE1180DEA11B9EB5E /* IslandPanelController.swift */; };
+		69B2B1ACF27FFF083B5329CF /* InboxFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F386353D307B4E8570A33C94 /* InboxFilter.swift */; };
 		705937266909A06983C84335 /* GitHubOAuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8A3C849C68254AE3C33534 /* GitHubOAuthConfiguration.swift */; };
 		72B6EA2ADBBD45616C370693 /* git-island-menu-bar.svg in Resources */ = {isa = PBXBuildFile; fileRef = F9A8FEDB6DBACD11B1E51CD6 /* git-island-menu-bar.svg */; };
 		7FFBA998907A55B33E15F966 /* RelayDeviceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14C2D1F194C162858F2B516 /* RelayDeviceSession.swift */; };
@@ -78,6 +79,7 @@
 		E21DE71D99CF961F4BAE8D73 /* GitIslandMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitIslandMenuView.swift; sourceTree = "<group>"; };
 		E368CE235BA6836252593CFF /* IslandSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandSoundPlayer.swift; sourceTree = "<group>"; };
 		EB7DCF20AF06569ACCAB6977 /* GitHubPullRequestService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubPullRequestService.swift; sourceTree = "<group>"; };
+		F386353D307B4E8570A33C94 /* InboxFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxFilter.swift; sourceTree = "<group>"; };
 		F4E924AFE1180DEA11B9EB5E /* IslandPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandPanelController.swift; sourceTree = "<group>"; };
 		F719804CA4233E90F4042708 /* OnboardingWelcomeContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWelcomeContent.swift; sourceTree = "<group>"; };
 		F9A8FEDB6DBACD11B1E51CD6 /* git-island-menu-bar.svg */ = {isa = PBXFileReference; path = "git-island-menu-bar.svg"; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 		7ACA35D8F6E4B5FEA8036974 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F386353D307B4E8570A33C94 /* InboxFilter.swift */,
 				60C9D8F38F289CB786E8AC52 /* IslandSound.swift */,
 				0F30EC1A6420E86D4904A3C9 /* PullRequest.swift */,
 			);
@@ -323,6 +326,7 @@
 				F250DC9CA704B0A0FBF4F4D3 /* GitIslandApp.swift in Sources */,
 				167814C409BE2F0A09FFEBCF /* GitIslandMenuView.swift in Sources */,
 				61CE7B294D6CFCA208320DF6 /* GitIslandStore.swift in Sources */,
+				69B2B1ACF27FFF083B5329CF /* InboxFilter.swift in Sources */,
 				007D9B6D69D0320E4369F890 /* IslandDesignSystem.swift in Sources */,
 				A640B5312CE1DE1702878EB5 /* IslandHostView.swift in Sources */,
 				63ED7E0BFD3B60AA57463609 /* IslandPanelController.swift in Sources */,

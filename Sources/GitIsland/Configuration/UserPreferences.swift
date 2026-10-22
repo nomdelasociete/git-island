@@ -16,6 +16,8 @@ enum UserPreferences {
     private static let legacyRefreshIntervalKey = "refreshIntervalMinutes"
     private static let repositoryFilterModeKey = "repositoryFilterMode"
     private static let selectedRepositoryFullNamesKey = "selectedRepositoryFullNames"
+    private static let mutedRepositoryFullNamesKey = "mutedRepositoryFullNames"
+    private static let hiddenPullRequestsKey = "hiddenPullRequests"
     private static let crazyAnimationsEnabledKey = "crazyAnimationsEnabled"
     private static let eventSoundsKey = "eventSounds"
     private static let outlineLaneWidthKey = "outlineLaneWidth"
@@ -76,6 +78,46 @@ enum UserPreferences {
                 normalizedRepositoryFullNames(newValue),
                 forKey: selectedRepositoryFullNamesKey
             )
+        }
+    }
+
+    static var mutedRepositoryFullNames: [String] {
+        get {
+            let stored = UserDefaults.standard.array(forKey: mutedRepositoryFullNamesKey) as? [String] ?? []
+            return normalizedRepositoryFullNames(stored)
+        }
+        set {
+            UserDefaults.standard.set(
+                normalizedRepositoryFullNames(newValue),
+                forKey: mutedRepositoryFullNamesKey
+            )
+        }
+    }
+
+    static var hiddenPullRequests: [HiddenPullRequest] {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: hiddenPullRequestsKey),
+                  let stored = try? JSONDecoder().decode([HiddenPullRequest].self, from: data)
+            else {
+                return []
+            }
+            return stored
+        }
+        set {
+            var byID: [Int: HiddenPullRequest] = [:]
+            for pullRequest in newValue {
+                byID[pullRequest.id] = pullRequest
+            }
+            let unique = byID.values.sorted {
+                if $0.repositoryFullName != $1.repositoryFullName {
+                    return $0.repositoryFullName < $1.repositoryFullName
+                }
+                return $0.number < $1.number
+            }
+            guard let data = try? JSONEncoder().encode(unique) else {
+                return
+            }
+            UserDefaults.standard.set(data, forKey: hiddenPullRequestsKey)
         }
     }
 

@@ -5,10 +5,13 @@ service has completed a production privacy review.
 
 ## GitHub
 
-The app sends authenticated requests to GitHub to read your profile, repositories,
-PRs, reviews, and checks. Explicit merge/update actions send writes to GitHub.
-The OAuth scope is `read:user repo`, including broad private-repository and write
-access. Repository selection limits queries, not permissions. Profile images
+The app sends authenticated requests to GitHub to read your profile, pull requests,
+reviews, and checks, including the repository metadata on those pull requests.
+It does not download the account's repository membership list. Explicit merge
+and branch-update actions send writes to GitHub. The OAuth scope is `read:user repo`,
+including broad private-repository and write access. A typed repository allowlist
+limits search queries. Muting a repository or hiding a pull request filters the
+inbox on this Mac and does not narrow the token's permissions. Profile images
 are requested from GitHub when shown in Settings.
 
 Tokens are stored in macOS Keychain with device-only accessibility on new writes.
@@ -18,7 +21,9 @@ credentials, including after restart. Legacy plaintext migration must both save
 to Keychain and delete the source file before authentication proceeds. Failures
 are reported in Settings. Debug uses its own legacy directory and does not
 read or delete the Release application's legacy file. PR data and account caches are held in
-memory; selected repository names and preferences are stored in UserDefaults.
+memory. UserDefaults stores preferences, the typed repository allowlist, muted
+repository names, and hidden pull-request records (id, group, head SHA, reason,
+repository name, and number). Hidden records do not include titles or review text.
 
 ## Optional live updates
 
@@ -50,7 +55,8 @@ invented PRs in screenshots and bug reports.
 
 ## Sign-out, revocation, and removal
 
-Sign-out clears the displayed inbox, selected repositories, and attempts to
+Sign-out clears the displayed inbox, the repository allowlist, muted repositories,
+hidden pull requests, and attempts to
 remove the GitHub token. It cannot erase a token from the process environment, but stops using it.
 The sign-out decision is saved before deletion; retained tokens cannot silently
 restore authentication. Failed cleanup is shown in Settings with a retry action
