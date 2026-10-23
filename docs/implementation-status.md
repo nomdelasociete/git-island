@@ -228,3 +228,15 @@ the website production build pass. The download link is checked in desktop and
 mobile browser layouts. Native onboarding/hover checks on notched hardware and
 two-account relay acceptance remain pending; distribution is not evidence of
 those runtime checks. No production app was launched or replaced during release.
+
+### Installation guide and Homebrew
+
+The site navigation links directly to the installation section, with DMG
+drag-to-Applications instructions and the official `nomdelasociete/tap/git-island`
+Homebrew cask. Homebrew updates require `brew update` and `brew upgrade`; no
+background updater is included. The cask uses the immutable release DMG URL and
+verified SHA-256. Future releases must bump its version and checksum in the tap.
+
+The cask passes Homebrew style and online audit, and installs successfully into
+an isolated application directory. The installed app passes Gatekeeper; it was
+not launched, and the temporary installation was removed after verification.

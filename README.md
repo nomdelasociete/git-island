@@ -16,6 +16,15 @@ Download the signed, Apple-notarized [Git Island 0.13 installer](https://github.
 open it and drag Git Island to Applications. Updates are manual: download the
 new installer from [Releases](https://github.com/nomdelasociete/git-island/releases).
 
+Or install with Homebrew:
+
+```sh
+brew install --cask nomdelasociete/tap/git-island
+```
+
+Update with `brew update && brew upgrade --cask nomdelasociete/tap/git-island`.
+Homebrew does not install updates in the background by default.
+
 ## Build from source
 
 Install Xcode 26 or later (Swift 6.2+) and
