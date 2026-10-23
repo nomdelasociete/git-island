@@ -4,37 +4,37 @@ Guidance for AI assistants working on **Git Island**.
 
 ## Publication authority (mandatory)
 
-Default workflow: update from `origin/main`, implement on a `jb/` branch, validate,
-commit, push that branch, and open a PR. Leave the PR open for the user.
+Follow the [official publication policy](CONTRIBUTING.md#official-publications).
+For agent-assisted work, prepare changes on a branch, validate them, and open a
+PR. Leave it open for maintainer review.
 
-- **Merge requires an explicit user request for that PR.** A request to fix,
-  implement, check, prepare, or open a PR does not authorize merging, enabling
-  auto-merge, pushing directly to `main`, or bypassing review/CI requirements.
-- **Website deployment belongs exclusively to CI after a PR merges into `main`.**
-  Never deploy directly to Cloudflare from a local checkout, another branch,
-  a CLI, API, dashboard, or tool. This includes `npm run deploy`, `cf deploy`,
-  `wrangler deploy`, prebuilt uploads, and direct rollbacks. Use local builds
-  and previews for validation; correct production through a reviewed PR.
-  Do not rerun an older deployment job to publish a stale revision.
-- **Homebrew, DMG, and TestFlight each require an explicit user publication request.**
-  Authorization for one channel does not authorize the others or future releases.
-  A site merge does not authorize any app release. If the requested channels or
-  release are ambiguous, prepare the artifacts and ask before publication.
-- Without that request, keep release work local or in a PR: no TestFlight binary
-  upload, tester distribution, GitHub release creation (including drafts), DMG
-  asset upload/replacement, or publication of a cask update to the Homebrew tap.
-  Homebrew changes also go through a PR in `nomdelasociete/homebrew-tap`; never
-  push directly to its default branch. Never add automatic app-release publishing
-  as a side effect of a website or installation task.
-- Before an authorized merge or publication, fetch again and inspect pending
-  changes and deployments. Compare the intended revision with what production
-  actually serves. If production contains changes absent from `main`, or a newer
-  deployment could be replaced, report the discrepancy and reconcile it through
-  a PR before proceeding. Never silently overwrite work from another chat/branch.
-- Report preparation, upload, processing, distribution, and deployment separately.
-  Claim a website publication only after CI deployment succeeds and the public
-  assets match the intended revision. Claim an app release only after verifying
-  the requested channel's artifact and availability; upload alone is insufficient.
+- Merge or enable auto-merge only when the maintainer directing the task
+  explicitly requests it for that PR. A request to implement, fix, check,
+  prepare, or open a PR is not merge authorization. Never push directly to
+  `main` or bypass required reviews and checks.
+- Website production deployment runs exclusively in CI after a PR merges into
+  `main`. Never deploy directly to Cloudflare through a CLI, API, dashboard,
+  or tool, including prebuilt uploads and rollbacks. Use local builds and
+  previews for validation; prepare rollbacks as PRs. Do not rerun an older
+  deployment job to publish a stale revision.
+- Official Homebrew, DMG, and TestFlight publications each require an explicit
+  request from the maintainer directing the task, identifying the release and
+  channel. Authorization does not carry over to other channels or future releases.
+  A website merge is not authorization to release the app. If the scope is
+  ambiguous, prepare the work and clarify before any external release action.
+- Without that request, do not upload a TestFlight binary, distribute it to
+  testers, create a GitHub release (including drafts), upload or replace DMG
+  assets, or publish a cask update. Prepare Homebrew changes as a PR in the
+  official tap; never push directly to its default branch. Adding automatic
+  app-release publishing also requires an explicit maintainer request.
+- Before an authorized merge or publication, fetch current refs and inspect
+  pending deployments. Compare the intended revision with production. If
+  production includes changes absent from `main`, or the operation could replace
+  a newer deployment, report the discrepancy and reconcile it through a PR first.
+- Distinguish prepared artifacts, uploads, processing, and availability in reports.
+  Verify successful CI deployment and the served assets before reporting the
+  website published. Verify the artifact and availability in each requested app
+  distribution channel; a successful upload alone is insufficient.
 
 ## What this is
 

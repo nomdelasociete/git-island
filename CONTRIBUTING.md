@@ -39,19 +39,38 @@ it retains the retry credential in Keychain and writes a non-secret
 `recovery-account` pointer; an operator must finish revocation before removing it.
 Do not treat an ordinary unit-test pass as live-service acceptance.
 
-Publication follows [AGENTS.md](AGENTS.md#publication-authority-mandatory):
-leave PRs open unless the user explicitly requests a merge. The website deploys
-only through CI after a PR merges into `main`; direct Cloudflare deployment is
-prohibited. Homebrew, DMG, and TestFlight publication each require an explicit
-user request for that release and channel. Credentials are not authorization.
-Homebrew changes require a PR in the tap repository too.
-
 Release uploads require explicit `TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`,
 and `ASC_KEY_PATH`. Archiving requires Release and an explicit team. Never commit
 the signing key or supply release credentials to pull-request jobs.
 
 Match surrounding Swift style. Add tests for changed behavior where useful;
 avoid unrelated refactors. Keep README and behavior documentation accurate.
+
+## Official publications
+
+This policy governs the project's official website, GitHub releases, Homebrew
+tap, and TestFlight distribution. It does not restrict independent builds or
+fork distributions permitted by the project's license.
+
+Contributions are submitted as pull requests. Maintainers decide when to merge
+after the required reviews and CI checks pass; direct pushes to `main` and
+bypassing those checks are not part of the publication workflow.
+
+The website deploys exclusively through CI after a PR merges into `main`.
+Direct Cloudflare deployments, uploads, and rollbacks are prohibited. Website
+rollbacks follow the same reviewed PR and CI path. Local builds and previews
+are available for development without production access.
+
+Official Homebrew, DMG, and TestFlight releases are separate maintainer decisions.
+Each release and distribution channel requires explicit maintainer authorization,
+including binary uploads, draft releases, asset replacements, and tester
+distribution. A website merge does not authorize an app release. Homebrew cask
+changes require a PR in the [official tap](https://github.com/nomdelasociete/homebrew-tap).
+Access to signing credentials or deployment tools does not grant release authority.
+
+Before publication, reconcile the intended revision with the current production
+revision and pending deployments to avoid replacing newer or unmerged work.
+Verify the deployed assets or distributed artifact before announcing availability.
 
 ## Privacy and security
 

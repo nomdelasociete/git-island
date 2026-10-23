@@ -63,11 +63,11 @@ droplet splash and expanding water ripples; pause and reduced motion apply.
 
 ## Deploy
 
-The only production publication path is a PR merged into `main`, followed by
-successful CI and the `deploy-website` job. Follow the publication authority rules
-in [AGENTS.md](../AGENTS.md#publication-authority-mandatory). Agents leave PRs open
-unless the user explicitly requests their merge. Direct Cloudflare deployment
-and rollback from local tools, APIs, or the dashboard are prohibited.
+The official site deploys exclusively through CI after a reviewed PR merges into
+`main` and the required checks pass. See the
+[official publication policy](../CONTRIBUTING.md#official-publications).
+Direct Cloudflare deployments and rollbacks are prohibited; prepare changes and
+rollbacks as PRs. Local development does not require production credentials.
 
 For local validation, use `npm ci`, `npm run build`, and `npm run preview`.
 The `deploy` package script is reserved for the CI production job. The scoped
