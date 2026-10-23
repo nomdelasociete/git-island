@@ -177,7 +177,7 @@ a credited CC BY MacBook Pro model, and an HTML Git Island inbox with eight
 fictional PRs and pausable status updates. The browser island now follows native
 source layout, colors, row metrics, outline and hover behavior. The page uses the official app logo. It includes scroll navigation, mobile layouts,
 reduced-motion handling, and a WebGL fallback. The production web build and
-local browser interaction checks pass. This prototype is not deployed and does
+local browser interaction checks pass. This prototype is now deployed as the public website described below. It does
 not modify or launch the native app. See website/README.md for local use.
 
 ### Direct-download onboarding design (local preview)
@@ -194,7 +194,7 @@ notarize the resulting DMG. A separately labeled unsigned Debug preview was buil
 locally. Compile-only Xcode validation and all 113 ordinary SwiftPM tests pass.
 The shared welcome components were rendered for design inspection; full native
 runtime, Finder layout, and quarantined signed-download validation remain pending.
-Nothing has been published.
+This was an unpublished local preview; version 0.13 distribution is recorded below.
 
 Onboarding dismissal now uses a normal window with an always-enabled Set up later
 action, Escape and Command-W. Closing cancels pending view sign-in work and
