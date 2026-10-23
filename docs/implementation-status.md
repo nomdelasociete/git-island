@@ -124,8 +124,8 @@
   are persisted in UserDefaults. Visible-group selection is transient. Sign-out
   clears the allowlist, mutes, and hidden pull requests.
 - Idle auto-refresh interval preference is saved in UserDefaults.
-- No Sparkle updater or self-managed release artifact. TestFlight/App Store
-  Connect is the prepared distribution path.
+- Updates are manual for direct downloads; TestFlight is a separate distribution
+  channel. No Sparkle updater is included.
 - Second design pass: true notch gap, wing tabs, list-style rows, calmer motion.
 - Further shape tuning may still be needed against specific MacBook notch sizes.
 
@@ -177,7 +177,7 @@ a credited CC BY MacBook Pro model, and an HTML Git Island inbox with eight
 fictional PRs and pausable status updates. The browser island now follows native
 source layout, colors, row metrics, outline and hover behavior. The page uses the official app logo. It includes scroll navigation, mobile layouts,
 reduced-motion handling, and a WebGL fallback. The production web build and
-local browser interaction checks pass. This prototype is not deployed and does
+local browser interaction checks pass. This prototype is now deployed as the public website described below. It does
 not modify or launch the native app. See website/README.md for local use.
 
 ### Direct-download onboarding design (local preview)
@@ -194,7 +194,7 @@ notarize the resulting DMG. A separately labeled unsigned Debug preview was buil
 locally. Compile-only Xcode validation and all 113 ordinary SwiftPM tests pass.
 The shared welcome components were rendered for design inspection; full native
 runtime, Finder layout, and quarantined signed-download validation remain pending.
-Nothing has been published.
+This was an unpublished local preview; version 0.13 distribution is recorded below.
 
 Onboarding dismissal now uses a normal window with an always-enabled Set up later
 action, Escape and Command-W. Closing cancels pending view sign-in work and
@@ -211,5 +211,20 @@ validation remains pending because the UI automation service timed out.
 The merged website is deployed at https://gitis.land using Cloudflare Workers
 static assets in NOM DE LA SOCIETE. Versioned cf CLI/Vite tooling, explicit account
 and custom-domain configuration, and repeatable deployment instructions are in
-`website/`. HTTPS and static asset delivery are verified. App downloads still
-link to source-build instructions; no signed DMG release is published.
+`website/`. HTTPS and static asset delivery are verified. The download button links to the signed GitHub release installer; source-build
+instructions remain available.
+
+### Version 0.13 distribution
+
+Version 0.13 (202610230001) packages the new branding/onboarding and PR hiding /
+repository muting changes. The direct-download app and DMG are signed by NOM DE
+LA SOCIETE, notarized by Apple, stapled, and accepted by Gatekeeper. The website
+links to the versioned GitHub release asset. Direct-download updates are manual.
+The same archive is exported separately for TestFlight, with build-specific
+What to Test notes for the existing internal group.
+
+All 116 ordinary SwiftPM tests, the Release archive, both signed exports, and
+the website production build pass. The download link is checked in desktop and
+mobile browser layouts. Native onboarding/hover checks on notched hardware and
+two-account relay acceptance remain pending; distribution is not evidence of
+those runtime checks. No production app was launched or replaced during release.

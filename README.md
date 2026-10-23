@@ -10,6 +10,12 @@ or explicitly confirm a merge. GitHub remains the authority on merge permissions
 Requires **macOS 26 or later**. The island needs a MacBook with a notch;
 other displays do not show it. The menu-bar controls remain available.
 
+## Install
+
+Download the signed, Apple-notarized [Git Island 0.13 installer](https://github.com/nomdelasociete/git-island/releases/download/v0.13/Git-Island-0.13.dmg),
+open it and drag Git Island to Applications. Updates are manual: download the
+new installer from [Releases](https://github.com/nomdelasociete/git-island/releases).
+
 ## Build from source
 
 Install Xcode 26 or later (Swift 6.2+) and
@@ -56,8 +62,8 @@ trigger fresh GitHub reads. Live access is an additional authorization; signing
 out of GitHub does not revoke it. The hosted implementation is not included here.
 
 See [PRIVACY.md](PRIVACY.md) for current data flows, storage, and removal limits.
-Hosted-service readiness and distribution review are still in progress. This
-repository does not promise a public relay service or a general-release download.
+Hosted-service readiness is still in progress. The direct-download app works
+with periodic GitHub refreshes; this repository does not promise a public relay service.
 
 ## Contribute
 
