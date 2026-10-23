@@ -300,6 +300,19 @@ document.querySelectorAll("[data-filter]").forEach((b) =>
 renderInbox();
 openInbox(false);
 let renderer, scene, camera, ocean;
+const interactiveActors = [];
+const trees = [];
+const platformCenter = { x: 0.8, z: 0.65 };
+const platformRadius = (x, z) =>
+  Math.hypot((x - platformCenter.x) / 2.8, (z - platformCenter.z) / 2.184);
+const boatPosition = (t) => {
+  const a = (anchoredAt ?? t) * 0.025 + 1.25;
+  return { x: 3 + Math.cos(a) * 8.1, z: Math.sin(a) * 6.4, a };
+};
+const impulse = (actor, t) => {
+  const age = t - (actor.userData.tappedAt ?? -100);
+  return age >= 0 && age < 3 ? Math.sin(age * 9) * Math.exp(-age * 1.8) : 0;
+};
 let seed = 831;
 function random() {
   seed = (1664525 * seed + 1013904223) >>> 0;
@@ -314,20 +327,17 @@ function height(x, z) {
   const a = Math.atan2(z, x),
     r = Math.sqrt((x / 1.15) ** 2 + (z / 0.9) ** 2),
     coast = 5.1 + 0.5 * Math.sin(a * 3 + 0.7) + 0.3 * Math.cos(a * 5);
-  const base = Math.max(0, 1 - r / coast),
-    ridge = 1.85 * Math.exp(-((x + 1.5) ** 2 / 4 + (z + 1.5) ** 2 / 2));
-  const terrain =
-    base > 0
-      ? 0.12 +
-        1.15 * Math.pow(base, 0.42) +
-        ridge +
-        (Math.sin(x * 3.2 + z * 2) * 0.1 + Math.cos(z * 4.1 - x) * 0.07) *
-          Math.min(1, base * 5)
-      : -0.48;
-  const clearing =
-    (1 - smooth(2.3, 3.1, Math.abs(x - 0.8))) *
-    (1 - smooth(1.8, 2.6, Math.abs(z - 0.6)));
-  return T.MathUtils.lerp(terrain, Math.min(terrain, 1.15), clearing);
+  const inland = coast - r;
+  const base = Math.max(0, inland / coast);
+  const ridge = 1.85 * Math.exp(-((x + 1.5) ** 2 / 4 + (z + 1.5) ** 2 / 2));
+  // A continuous beach crosses the water plane, rather than ending in a cliff.
+  const terrain = -0.18 + 1.45 * Math.pow(base, 0.65) +
+    ridge * smooth(0, 1.3, inland) +
+    (Math.sin(x * 3.2 + z * 2) * 0.1 + Math.cos(z * 4.1 - x) * 0.07) *
+      smooth(0, 1.5, inland);
+  // The entire plinth footprint rests on one level clearing, blended into the hill.
+  const clearing = 1 - smooth(1, 1.3, platformRadius(x, z));
+  return T.MathUtils.lerp(terrain, 1.2, clearing);
 }
 function mesh(geo, material, parent = scene) {
   const m = new T.Mesh(geo, material);
@@ -343,6 +353,8 @@ function tree(x, z, size, parent) {
   g.position.set(x, y, z);
   g.scale.setScalar(size);
   parent.add(g);
+  interactiveActors.push(g);
+  trees.push(g);
   mesh(new T.CylinderGeometry(0.035, 0.065, 0.8, 6), trunkMat, g).position.y =
     0.35;
   for (let i = 0; i < 3; i++) {
@@ -444,6 +456,7 @@ const seaActors = [];
 const waterContacts = {
   sail: { value: new T.Vector4(100, 100, 0, 0) },
   whale: { value: new T.Vector4(100, 100, 0, 0) },
+  tap: { value: new T.Vector4(100, 100, 10, 0) },
   splash: { value: new T.Vector4(100, 100, 10, 0) },
 };
 function makeSeaLife() {
@@ -526,16 +539,26 @@ function makeSeaLife() {
             drops.setMatrixAt(i, droplet.matrix);
           }
           drops.instanceMatrix.needsUpdate = true;
-          actor.position.set(x, -size.y * scale * (1.1 - 0.32 * surface), z);
+          // Dive before entering the boat's safety envelope, including when anchored.
+          const boat = boatPosition(t);
+          const clearance = smooth(2.2, 3.8, Math.hypot(x - boat.x, z - boat.z));
+          const visibleSurface = surface * clearance;
+          drops.visible = clearance > 0.99;
+          waterContacts.splash.value.w *= clearance > 0.99 ? 1 : 0;
+          actor.position.set(
+            x,
+            -size.y * scale * (1.1 - 0.32 * visibleSurface) - 0.6 * (1 - clearance),
+            z,
+          );
           actor.rotation.set(0, heading + Math.PI / 2, 0);
-          waterContacts.whale.value.set(x, z, heading, surface);
+          waterContacts.whale.value.set(x, z, heading, visibleSurface);
         });
       } else {
+        interactiveActors.push(actor);
         seaActors.push((t) => {
           // An anchored boat still rocks; only its course stops.
-          const a = (anchoredAt ?? t) * 0.025 + 1.25;
-          const x = 3 + Math.cos(a) * 8.1,
-            z = Math.sin(a) * 6.4;
+          const { x, z, a } = boatPosition(t);
+          const nudge = impulse(actor, t);
           const heading = Math.atan2(-8.1 * Math.sin(a), 6.4 * Math.cos(a));
           const swell = Math.sin(x * 0.8 + z * 0.6 + t * 0.8);
           // Waterline is measured from the keel, not the whole model's
@@ -544,9 +567,12 @@ function makeSeaLife() {
           actor.rotation.set(
             Math.cos(t * 0.8 + spec.phase) * 0.004,
             heading,
-            Math.sin(t * 0.7 + spec.phase) * 0.006,
+            Math.sin(t * 0.7 + spec.phase) * 0.006 + nudge * 0.16,
           );
           waterContacts.sail.value.set(x, z, heading, 1);
+          const age = t - (actor.userData.tappedAt ?? -100);
+          waterContacts.tap.value.z = age;
+          waterContacts.tap.value.w = age >= 0 && age < 3 ? 1 : 0;
         });
       }
       document.body.dataset.seaModels = String(
@@ -559,10 +585,10 @@ function initScene() {
     antialias: true,
     powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+  renderer.setPixelRatio(Math.min(Math.max(devicePixelRatio, 1.5), 2));
   renderer.setSize(innerWidth, innerHeight);
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = T.PCFSoftShadowMap;
+  renderer.shadowMap.type = T.PCFShadowMap;
   renderer.shadowMap.autoUpdate = false;
   renderer.shadowMap.needsUpdate = true;
   renderer.toneMapping = T.ACESFilmicToneMapping;
@@ -637,7 +663,7 @@ function initScene() {
       x = Math.cos(a) * r * 1.1,
       z = Math.sin(a) * r * 0.85,
       y = height(x, z);
-    if (y < -0.1) continue;
+    if (y < -0.1 || platformRadius(x, z) < 1.2) continue;
     const rock = mesh(
       new T.DodecahedronGeometry(0.15 + random() * 0.3),
       stoneMat,
@@ -652,7 +678,7 @@ function initScene() {
     mat("#a5aa95"),
     island,
   );
-  platform.position.set(0.8, 1.29, 0.8);
+  platform.position.set(platformCenter.x, 1.33, platformCenter.z);
   platform.scale.z = 0.78;
   platform.visible = !capturing;
   makeDevice(island);
@@ -667,7 +693,7 @@ function initScene() {
         "varying vec3 world; void main(){world=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(world,1.);}",
       fragmentShader: [
         `varying vec3 world;
-        uniform float time; uniform vec4 sail; uniform vec4 whale; uniform vec4 splash;
+        uniform float time; uniform vec4 sail; uniform vec4 whale; uniform vec4 splash; uniform vec4 tap;
         vec2 contactUV(vec4 c){
           vec2 d=world.xz-c.xy; vec2 f=vec2(sin(c.z),cos(c.z));
           return vec2(dot(d,vec2(f.y,-f.x)),dot(d,f));
@@ -683,17 +709,19 @@ function initScene() {
         float hullShadow(vec4 c){vec2 q=contactUV(c);return exp(-dot(q/vec2(.4,.9),q/vec2(.4,.9)))*c.w;}
         void main(){`,
         "vec2 p=world.xz-vec2(3.,0.);float a=atan(p.y,p.x);float r=length(vec2(p.x/1.15,p.y/.9));",
-        "float coast=5.1+.5*sin(a*3.+.7)+.3*cos(a*5.);float shore=r-coast;",
+        "float coast=5.1+.5*sin(a*3.+.7)+.3*cos(a*5.);float waterline=coast*(1.-pow(.195/1.45,1./.65));float shore=r-waterline;",
         "vec3 col=mix(vec3(.58,.76,.71),vec3(.43,.62,.64),smoothstep(0.,5.,shore));",
-        "float waves=sin(r*8.-time*1.3+sin(a*7.)*.4)*.5+.5;",
-        "col+=pow(waves,18.)*exp(-max(0.,shore)*.6)*smoothstep(-.5,.15,shore)*.13;",
-        "col+=sin(world.x*9.+world.z*6.+time*.65)*sin(world.z*11.-time*.46)*.009;",
+        "float phase=shore*7.-time*.8;float aa=1.-smoothstep(.4,2.,fwidth(phase));",
+        "float waves=pow(.5+.5*sin(phase),6.);",
+        "col+=waves*aa*exp(-max(0.,shore)*1.8)*smoothstep(-.05,.2,shore)*.065;",
+        "col+=exp(-pow(shore/.12,2.))*.055;",
+        "col+=sin(world.x*2.+world.z*1.6+time*.65)*sin(world.z*2.4-time*.46)*.004;",
         `col=mix(col,vec3(.863,.902,.906),smoothstep(10.,45.,length(p)));
         col-=vec3(.055,.04,.025)*hullShadow(sail);
         col+=vec3(.75,.87,.83)*wake(sail);
         vec2 w=contactUV(whale);
         float body=exp(-dot(w/vec2(.36,1.2),w/vec2(.36,1.2)));
-        col=mix(col,col*vec3(.8,.9,.95),body*.6);
+        col=mix(col,col*vec3(.8,.9,.95),body*.6*whale.w);
         float rings=length(w/vec2(.5,1.5));
         float ripple=pow(.5+.5*sin(rings*23.-time*1.3),12.)*exp(-max(0.,rings-1.)*3.)*smoothstep(.8,1.1,rings);
         col+=ripple*whale.w*.065;
@@ -706,32 +734,44 @@ function initScene() {
           impact+=ring*step(0.,age)*(1.-smoothstep(1.,4.5,age));
         }
         col+=vec3(.65,.8,.78)*impact*splash.w*.18;
+        float tapDistance=length(world.xz-tap.xy);
+        float tapWidth=max(.06,fwidth(tapDistance)*1.5);
+        float tapRing=exp(-pow((tapDistance-(.4+tap.z*.8))/tapWidth,2.));
+        col+=tapRing*tap.w*(1.-smoothstep(0.,3.,tap.z))*.1;
         gl_FragColor=vec4(col,1.);}`,
       ].join(""),
     }),
   );
   ocean.position.y = 0.015;
   scene.add(ocean);
-  for (let j = 0; j < 4; j++) {
-    const points = [];
-    for (let i = 0; i <= 180; i++) {
-      const a = (i / 180) * Math.PI * 2,
-        r = 5.5 + j * 0.7 + 0.5 * Math.sin(a * 3 + 0.7) + 0.3 * Math.cos(a * 5);
-      points.push(
-        new T.Vector3(3 + Math.cos(a) * r * 1.15, 0.023, Math.sin(a) * r * 0.9),
-      );
+  const raycaster = new T.Raycaster();
+  const pointer = new T.Vector2();
+  const pick = (event) => {
+    if (reduce.matches || currentP > 0.65 || event.target !== renderer.domElement) return null;
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.set((event.clientX - rect.left) / rect.width * 2 - 1,
+      -(event.clientY - rect.top) / rect.height * 2 + 1);
+    raycaster.setFromCamera(pointer, camera);
+    // Include the terrain and device so hidden trees cannot be clicked through them.
+    const hit = raycaster.intersectObjects(scene.children, true)[0];
+    let object = hit?.object;
+    while (object) {
+      if (interactiveActors.includes(object)) return object;
+      object = object.parent;
     }
-    scene.add(
-      new T.Line(
-        new T.BufferGeometry().setFromPoints(points),
-        new T.LineBasicMaterial({
-          color: "#d3e6d9",
-          transparent: true,
-          opacity: 0.2 - j * 0.035,
-        }),
-      ),
-    );
-  }
+    return null;
+  };
+  renderer.domElement.addEventListener("pointermove", (event) => {
+    renderer.domElement.style.cursor = pick(event) ? "pointer" : "";
+  });
+  renderer.domElement.addEventListener("click", (event) => {
+    const actor = pick(event);
+    if (!actor || elapsed - (actor.userData.tappedAt ?? -100) < 0.45) return;
+    actor.userData.tappedAt = elapsed;
+    if (!trees.includes(actor)) {
+      waterContacts.tap.value.set(actor.position.x, actor.position.z, 0, 1);
+    }
+  });
 }
 try {
   initScene();
@@ -864,6 +904,14 @@ function frame(time) {
   camera.lookAt(aim);
   ocean.material.uniforms.time.value = elapsed;
   seaActors.forEach((update) => update(elapsed));
+  let movingTrees = false;
+  trees.forEach((tree) => {
+    const bend = impulse(tree, elapsed);
+    movingTrees ||= bend !== 0 || tree.rotation.z !== 0;
+    tree.rotation.z = bend * 0.12;
+    tree.rotation.x = bend * 0.045;
+  });
+  if (movingTrees) renderer.shadowMap.needsUpdate = true;
   renderer.render(scene, camera);
 }
 if (!capturing) requestAnimationFrame(frame);

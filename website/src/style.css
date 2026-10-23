@@ -145,11 +145,16 @@ body.no-webgl .scene-status {
     linear-gradient(0deg, #d8e5e66a, transparent 18%);
 }
 .intro {
+  pointer-events: none;
   position: absolute;
   left: 8%;
   top: 16%;
   width: 420px;
   will-change: opacity, transform;
+}
+.intro button,
+.intro a {
+  pointer-events: auto;
 }
 .small-intro {
   font-size: 13px;
