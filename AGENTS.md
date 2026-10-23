@@ -2,6 +2,40 @@
 
 Guidance for AI assistants working on **Git Island**.
 
+## Publication authority (mandatory)
+
+Follow the [official publication policy](CONTRIBUTING.md#official-publications).
+For agent-assisted work, prepare changes on a branch, validate them, and open a
+PR. Leave it open for maintainer review.
+
+- Merge or enable auto-merge only when the maintainer directing the task
+  explicitly requests it for that PR. A request to implement, fix, check,
+  prepare, or open a PR is not merge authorization. Never push directly to
+  `main` or bypass required reviews and checks.
+- Website production deployment runs exclusively in CI after a PR merges into
+  `main`. Never deploy directly to Cloudflare through a CLI, API, dashboard,
+  or tool, including prebuilt uploads and rollbacks. Use local builds and
+  previews for validation; prepare rollbacks as PRs. Do not rerun an older
+  deployment job to publish a stale revision.
+- Official Homebrew, DMG, and TestFlight publications each require an explicit
+  request from the maintainer directing the task, identifying the release and
+  channel. Authorization does not carry over to other channels or future releases.
+  A website merge is not authorization to release the app. If the scope is
+  ambiguous, prepare the work and clarify before any external release action.
+- Without that request, do not upload a TestFlight binary, distribute it to
+  testers, create a GitHub release (including drafts), upload or replace DMG
+  assets, or publish a cask update. Prepare Homebrew changes as a PR in the
+  official tap; never push directly to its default branch. Adding automatic
+  app-release publishing also requires an explicit maintainer request.
+- Before an authorized merge or publication, fetch current refs and inspect
+  pending deployments. Compare the intended revision with production. If
+  production includes changes absent from `main`, or the operation could replace
+  a newer deployment, report the discrepancy and reconcile it through a PR first.
+- Distinguish prepared artifacts, uploads, processing, and availability in reports.
+  Verify successful CI deployment and the served assets before reporting the
+  website published. Verify the artifact and availability in each requested app
+  distribution channel; a successful upload alone is insufficient.
+
 ## What this is
 
 Native macOS 26 menu-bar utility: a **notch-adjacent Dynamic Island** showing counters for the signed-in user's GitHub PR inbox — `blocked`, `waiting`, `testing`, `ready`. Notch MacBooks only.

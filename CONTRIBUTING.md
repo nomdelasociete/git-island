@@ -46,6 +46,32 @@ the signing key or supply release credentials to pull-request jobs.
 Match surrounding Swift style. Add tests for changed behavior where useful;
 avoid unrelated refactors. Keep README and behavior documentation accurate.
 
+## Official publications
+
+This policy governs the project's official website, GitHub releases, Homebrew
+tap, and TestFlight distribution. It does not restrict independent builds or
+fork distributions permitted by the project's license.
+
+Contributions are submitted as pull requests. Maintainers decide when to merge
+after the required reviews and CI checks pass; direct pushes to `main` and
+bypassing those checks are not part of the publication workflow.
+
+The website deploys exclusively through CI after a PR merges into `main`.
+Direct Cloudflare deployments, uploads, and rollbacks are prohibited. Website
+rollbacks follow the same reviewed PR and CI path. Local builds and previews
+are available for development without production access.
+
+Official Homebrew, DMG, and TestFlight releases are separate maintainer decisions.
+Each release and distribution channel requires explicit maintainer authorization,
+including binary uploads, draft releases, asset replacements, and tester
+distribution. A website merge does not authorize an app release. Homebrew cask
+changes require a PR in the [official tap](https://github.com/nomdelasociete/homebrew-tap).
+Access to signing credentials or deployment tools does not grant release authority.
+
+Before publication, reconcile the intended revision with the current production
+revision and pending deployments to avoid replacing newer or unmerged work.
+Verify the deployed assets or distributed artifact before announcing availability.
+
 ## Privacy and security
 
 Use invented people, repositories, titles, addresses, and keys in fixtures and

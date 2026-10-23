@@ -63,32 +63,27 @@ droplet splash and expanding water ripples; pause and reduced motion apply.
 
 ## Deploy
 
-The pinned `cf` CLI deploys to the NOM DE LA SOCIETE account selected explicitly
-in `cloudflare.config.ts`. From `website/`, install the pinned tooling with
-`npm ci`, authenticate with `npx --no-install cf auth login`, then run
-`npm run deploy`. Before any Cloudflare build or deployment, run
-`unset CLOUDFLARE_ACCOUNT_ID` so the checked-in account selection takes effect.
-The CLI gives that environment variable precedence over the configuration; if
-retaining it intentionally, it must equal `0a0c8c3111c01831f0604c9ad662706b`
-(NOM DE LA SOCIETE). Do not deploy with an account override from another project.
-The Vite plugin reads `cloudflare.config.ts` and generates Cloudflare Build
-Output: the static assets plus `worker/index.js`, a small Worker that only runs
-first for the og:video file (see below). The `gitis.land` custom domain is
-managed by the deployment. The Worker's only binding is `ASSETS`; no
-application secrets are used. The compatibility date stays at or below what the
-locally installed workerd supports, or `npm run dev` and `npm run preview`
-cannot start the Worker.
+The official site deploys exclusively through CI after a reviewed PR merges into
+`main` and the required checks pass. See the
+[official publication policy](../CONTRIBUTING.md#official-publications).
+Direct Cloudflare deployments and rollbacks are prohibited; prepare changes and
+rollbacks as PRs. Local development does not require production credentials.
 
-Use `npx --no-install cf deploy --dry-run` to validate first. To publish that exact build, use
-`npx --no-install cf deploy --prebuilt --mode production`. Generated `.cloudflare/` and
-`.wrangler/` directories are ignored. Unknown paths return 404. Deployment is
-automatic after successful CI on pushes to `main` that change the website or
-its deployment configuration. The production environment accepts only `main`.
-The scoped `CLOUDFLARE_API_TOKEN` GitHub Actions secret is exposed only to the
-production deployment step, never to pull-request builds. The first production
-run publishes a baseline. Later runs compare against the last successful
-`website-production` deployment, preserving changes across failed or queued runs.
-App-only changes skip publishing; manual CLI deployment remains available.
+For local validation, use `npm ci`, `npm run build`, and `npm run preview`.
+The `deploy` package script is reserved for the CI production job. The scoped
+`CLOUDFLARE_API_TOKEN` is exposed only to that job, never to pull-request builds.
+CI selects the NOM DE LA SOCIETE account configured in `cloudflare.config.ts`.
+
+The Vite plugin generates Cloudflare Build Output: static assets and
+`worker/index.js`, which handles og:video Range requests. The Worker's only
+binding is `ASSETS`; no application secrets are used. The compatibility date
+must stay within the locally installed workerd's supported range. Generated
+`.cloudflare/` and `.wrangler/` directories are ignored; unknown paths return 404.
+
+The production environment accepts only `main`. Runs compare against the last
+successful `website-production` deployment, preserving changes across failed or
+queued runs. App-only changes skip website publishing. A website deployment
+does not publish a DMG, TestFlight build, or Homebrew cask.
 
 Social sharing uses static Open Graph and Twitter card metadata in `index.html`
 and the 1200 × 630 `public/social-preview-v2.png` image, rendered from the actual
