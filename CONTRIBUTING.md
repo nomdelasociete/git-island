@@ -39,6 +39,13 @@ it retains the retry credential in Keychain and writes a non-secret
 `recovery-account` pointer; an operator must finish revocation before removing it.
 Do not treat an ordinary unit-test pass as live-service acceptance.
 
+Publication follows [AGENTS.md](AGENTS.md#publication-authority-mandatory):
+leave PRs open unless the user explicitly requests a merge. The website deploys
+only through CI after a PR merges into `main`; direct Cloudflare deployment is
+prohibited. Homebrew, DMG, and TestFlight publication each require an explicit
+user request for that release and channel. Credentials are not authorization.
+Homebrew changes require a PR in the tap repository too.
+
 Release uploads require explicit `TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`,
 and `ASC_KEY_PATH`. Archiving requires Release and an explicit team. Never commit
 the signing key or supply release credentials to pull-request jobs.

@@ -2,6 +2,40 @@
 
 Guidance for AI assistants working on **Git Island**.
 
+## Publication authority (mandatory)
+
+Default workflow: update from `origin/main`, implement on a `jb/` branch, validate,
+commit, push that branch, and open a PR. Leave the PR open for the user.
+
+- **Merge requires an explicit user request for that PR.** A request to fix,
+  implement, check, prepare, or open a PR does not authorize merging, enabling
+  auto-merge, pushing directly to `main`, or bypassing review/CI requirements.
+- **Website deployment belongs exclusively to CI after a PR merges into `main`.**
+  Never deploy directly to Cloudflare from a local checkout, another branch,
+  a CLI, API, dashboard, or tool. This includes `npm run deploy`, `cf deploy`,
+  `wrangler deploy`, prebuilt uploads, and direct rollbacks. Use local builds
+  and previews for validation; correct production through a reviewed PR.
+  Do not rerun an older deployment job to publish a stale revision.
+- **Homebrew, DMG, and TestFlight each require an explicit user publication request.**
+  Authorization for one channel does not authorize the others or future releases.
+  A site merge does not authorize any app release. If the requested channels or
+  release are ambiguous, prepare the artifacts and ask before publication.
+- Without that request, keep release work local or in a PR: no TestFlight binary
+  upload, tester distribution, GitHub release creation (including drafts), DMG
+  asset upload/replacement, or publication of a cask update to the Homebrew tap.
+  Homebrew changes also go through a PR in `nomdelasociete/homebrew-tap`; never
+  push directly to its default branch. Never add automatic app-release publishing
+  as a side effect of a website or installation task.
+- Before an authorized merge or publication, fetch again and inspect pending
+  changes and deployments. Compare the intended revision with what production
+  actually serves. If production contains changes absent from `main`, or a newer
+  deployment could be replaced, report the discrepancy and reconcile it through
+  a PR before proceeding. Never silently overwrite work from another chat/branch.
+- Report preparation, upload, processing, distribution, and deployment separately.
+  Claim a website publication only after CI deployment succeeds and the public
+  assets match the intended revision. Claim an app release only after verifying
+  the requested channel's artifact and availability; upload alone is insufficient.
+
 ## What this is
 
 Native macOS 26 menu-bar utility: a **notch-adjacent Dynamic Island** showing counters for the signed-in user's GitHub PR inbox — `blocked`, `waiting`, `testing`, `ready`. Notch MacBooks only.
