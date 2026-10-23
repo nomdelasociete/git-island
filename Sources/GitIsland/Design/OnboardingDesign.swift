@@ -23,8 +23,8 @@ struct OnboardingBrandPanel: View {
             }
             .padding(.bottom, 52)
 
-            Text("Your work.\nA little\nmore clear.")
-                .font(.system(size: 39, weight: .semibold))
+            Text("Your pull requests.\nA little\ncloser.")
+                .font(.system(size: 32, weight: .semibold))
                 .tracking(-1.8)
                 .lineSpacing(-1)
                 .fixedSize(horizontal: false, vertical: true)
