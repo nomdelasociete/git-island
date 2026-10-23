@@ -13,7 +13,13 @@ export default {
     headers.delete("content-length");
     const head = request.method === "HEAD";
     const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("range") ?? "");
-    if (!range || (!range[1] && !range[2]))
+    // Range only applies to GET, and an If-Range that is not this asset's
+    // strong ETag asks for the whole file (RFC 9110). Assets send no
+    // Last-Modified, so a date never matches.
+    const ifRange = request.headers.get("if-range"),
+      etag = asset.headers.get("etag");
+    const current = !ifRange || (etag && !etag.startsWith("W/") && ifRange === etag);
+    if (head || !current || !range || (!range[1] && !range[2]))
       return new Response(head ? null : body, { headers });
     // "bytes=a-b", "bytes=a-" or the last n bytes with "bytes=-n".
     const start = range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2])),
