@@ -54,10 +54,8 @@
         <button class="quiet" data-go="0.91">Try the island</button
         ><a
           class="source-link"
-          href="https://github.com/nomdelasociete/git-island"
-          target="_blank"
-          rel="noopener noreferrer"
-          >View on GitHub <span aria-hidden="true">↗</span></a
+          href="#install"
+          >Install for Mac <span aria-hidden="true">↓</span></a
         >
       </nav>
     </header>
@@ -159,7 +157,7 @@
         </div>
       </section>
       <section class="closing" id="about">
-        <div class="closing-heading">
+        <div class="closing-heading" id="install">
           <span class="small-intro">While you work.</span>
           <h2>Back to making.<br />The island stays up.</h2>
           <a
@@ -167,8 +165,26 @@
             href="https://github.com/nomdelasociete/git-island/releases/download/v0.13/Git-Island-0.13.dmg"
             target="_blank"
             rel="noopener noreferrer"
-            >Download for Mac <span aria-hidden="true">↓</span></a
+            >Download .dmg <span aria-hidden="true">↓</span></a
           ><button class="quiet replay" data-go="0">Replay the journey</button>
+        </div>
+        <div class="install-guide" aria-label="Install Git Island">
+          <div>
+            <h3>Up and running in a minute.</h3>
+            <ol>
+              <li>Download and open the DMG.</li>
+              <li>Drag Git Island into Applications.</li>
+              <li>Open Git Island from Applications and sign in to GitHub.</li>
+            </ol>
+            <p>macOS 26 or later. A notched MacBook for the island. Signed by Nom de la société and notarized by Apple.</p>
+          </div>
+          <div>
+            <h3>Prefer Homebrew?</h3>
+            <pre><code>brew install --cask nomdelasociete/tap/git-island</code></pre>
+            <p>To update:</p>
+            <pre><code>brew update &amp;&amp; brew upgrade --cask nomdelasociete/tap/git-island</code></pre>
+            <p>Homebrew updates run when you ask. For DMG installs, download the newer version and replace the app in Applications.</p>
+          </div>
         </div>
         <div class="details">
           <article>
