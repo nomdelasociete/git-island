@@ -71,9 +71,13 @@ in `cloudflare.config.ts`. From `website/`, install the pinned tooling with
 The CLI gives that environment variable precedence over the configuration; if
 retaining it intentionally, it must equal `0a0c8c3111c01831f0604c9ad662706b`
 (NOM DE LA SOCIETE). Do not deploy with an account override from another project.
-The Vite plugin generates Cloudflare Build
-Output; only generated static assets are uploaded. The `gitis.land` custom domain
-is managed by the deployment. No runtime bindings or application secrets are used.
+The Vite plugin reads `cloudflare.config.ts` and generates Cloudflare Build
+Output: the static assets plus `worker/index.js`, a small Worker that only runs
+first for the og:video file (see below). The `gitis.land` custom domain is
+managed by the deployment. The Worker's only binding is `ASSETS`; no
+application secrets are used. The compatibility date stays at or below what the
+locally installed workerd supports, or `npm run dev` and `npm run preview`
+cannot start the Worker.
 
 Use `npx --no-install cf deploy --dry-run` to validate first. To publish that exact build, use
 `npx --no-install cf deploy --prebuilt --mode production`. Generated `.cloudflare/` and
@@ -100,4 +104,9 @@ a pull request green, and closes at its real size. `npm run capture:video`
 renders it: `?capture` stops the page clock and the script steps every frame,
 CSS transitions included, then dissolves the tail into the opening with ffmpeg.
 It needs Google Chrome and ffmpeg with libx264. Write a new `-vN` file and
-update both `og:video` URLs when the scene changes.
+update both `og:video` URLs and `runWorkerFirst` in `cloudflare.config.ts` when
+the scene changes. Static assets answer Range requests with the whole file,
+which Apple's video stack (iMessage previews, Safari) refuses, so that path runs
+the Worker first and gets `206 Partial Content` responses. Every other request
+is a free static asset; requests that match no asset reach the Worker, which
+returns the same 404.
