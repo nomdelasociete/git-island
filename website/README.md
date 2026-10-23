@@ -91,3 +91,13 @@ and the 1200 × 630 `public/social-preview-v1.png` image, rendered from the actu
 website scene with navigation controls hidden. The scene model credits in
 `public/models/ATTRIBUTION.txt` also apply to this render. Version the image URL
 when replacing it so social crawlers can retrieve the new asset.
+
+`og:video` points to `public/social-video-v1.mp4`, a 6-second silent loop
+(1200 × 630, H.264) for previews that play video inline, such as Discord;
+everywhere else the image stays the card. The card is the Mac's screen: the
+island scene, without the MacBook, is the wallpaper and Git Island opens, turns
+a pull request green, and closes at its real size. `npm run capture:video`
+renders it: `?capture` stops the page clock and the script steps every frame,
+CSS transitions included, then dissolves the tail into the opening with ffmpeg.
+It needs Google Chrome and ffmpeg with libx264. Write a new `-vN` file and
+update both `og:video` URLs when the scene changes.

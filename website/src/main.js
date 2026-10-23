@@ -9,6 +9,13 @@ const $ = (s) => document.querySelector(s),
   desktop = $(".desktop");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)"),
   clamp = T.MathUtils.clamp;
+// ?capture turns the page into the social card: the scene becomes the
+// desktop wallpaper under the island, and the clock stops.
+// scripts/capture-social-video.mjs renders each frame through window.capture.
+const capturing = new URLSearchParams(location.search).has("capture");
+document.body.classList.toggle("capturing", capturing);
+let captureView = null,
+  anchoredAt = null;
 // ponytail: reveal waits on Draco decode of macbook-pro.glb. Shrink that
 // file if the spinner stays up; don't add a second loader.
 const macbookBytes = fetch("/models/macbook-pro.glb").then((response) => {
@@ -411,6 +418,8 @@ function makeDevice(parent) {
           m.receiveShadow = true;
         }
       });
+      // The card is the Mac's own screen; no Mac inside its wallpaper.
+      model.visible = !capturing;
       parent.add(model);
       renderer.shadowMap.needsUpdate = true;
       const screen = model.getObjectByName("Object_123");
@@ -523,7 +532,8 @@ function makeSeaLife() {
         });
       } else {
         seaActors.push((t) => {
-          const a = t * 0.025 + 1.25;
+          // An anchored boat still rocks; only its course stops.
+          const a = (anchoredAt ?? t) * 0.025 + 1.25;
           const x = 3 + Math.cos(a) * 8.1,
             z = Math.sin(a) * 6.4;
           const heading = Math.atan2(-8.1 * Math.sin(a), 6.4 * Math.cos(a));
@@ -644,6 +654,7 @@ function initScene() {
   );
   platform.position.set(0.8, 1.29, 0.8);
   platform.scale.z = 0.78;
+  platform.visible = !capturing;
   makeDevice(island);
   makeSeaLife();
   const waterGeo = new T.PlaneGeometry(2000, 2000);
@@ -750,7 +761,7 @@ addEventListener("resize", () => {
 reduce.addEventListener("change", updateScroll);
 updateScroll();
 function frame(time) {
-  requestAnimationFrame(frame);
+  if (!capturing) requestAnimationFrame(frame);
   const dt = Math.min((time - lastTime) / 1000, 0.15);
   lastTime = time;
   if (document.hidden) return;
@@ -837,7 +848,11 @@ function frame(time) {
     .set(0, 1, 0)
     .lerp(new T.Vector3(0, 0.94, -0.342).normalize(), smooth(0.48, 0.7, p));
   let aim;
-  if (p < 0.48) {
+  if (captureView) {
+    camera.up.set(0, 1, 0);
+    camera.position.fromArray(captureView.position);
+    aim = new T.Vector3().fromArray(captureView.look);
+  } else if (p < 0.48) {
     const t = smooth(0.03, 0.48, p);
     camera.position.copy(wide).lerp(mid, t);
     aim = look.lerp(midLook, t);
@@ -851,4 +866,54 @@ function frame(time) {
   seaActors.forEach((update) => update(elapsed));
   renderer.render(scene, camera);
 }
-requestAnimationFrame(frame);
+if (!capturing) requestAnimationFrame(frame);
+else {
+  // CSS transitions and keyframes follow the capture clock too: each one is
+  // paused and placed by how long ago, in capture time, it started. Changes
+  // made between two frames count from the earlier one.
+  const started = new WeakMap();
+  let captureTime = 0;
+  const hold = (time) => {
+    for (const animation of document.getAnimations()) {
+      if (!started.has(animation)) started.set(animation, time);
+      animation.pause();
+      animation.currentTime = captureTime - started.get(animation);
+    }
+  };
+  window.capture = {
+    ready: Promise.all([
+      document.fonts.ready,
+      new Promise((resolve) => {
+        const check = () =>
+          document.body.dataset.model && document.body.dataset.seaModels === "2"
+            ? resolve()
+            : setTimeout(check, 50);
+        check();
+      }),
+    ]),
+    start({ seaTime = 0, anchor = null, view }) {
+      elapsed = seaTime;
+      anchoredAt = anchor;
+      captureView = view;
+    },
+    open(value) {
+      filter = "all";
+      renderInbox();
+      openInbox(value);
+    },
+    status(id, state, label) {
+      Object.assign(
+        prs.find((pr) => pr.number === id),
+        { state, label },
+      );
+      changedPR = id;
+      renderInbox();
+    },
+    frame(seconds) {
+      hold(captureTime);
+      captureTime = seconds * 1000;
+      frame(captureTime);
+      hold(captureTime);
+    },
+  };
+}

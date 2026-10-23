@@ -1072,3 +1072,19 @@ body.no-webgl .scene-status {
 .expanded .other-counts .counter {
   pointer-events: auto;
 }
+/* Social card capture (?capture): the scene is the wallpaper, the island
+   sits at its real size, and the journey copy and controls step aside. */
+.capturing .navigation,
+.capturing .intro,
+.capturing .device-copy,
+.capturing .vignette,
+.capturing .journey-footer,
+.capturing .progress-track {
+  display: none;
+}
+.capturing .desktop {
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: none !important;
+  --notch-scale: 1 !important;
+}
