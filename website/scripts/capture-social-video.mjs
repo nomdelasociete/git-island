@@ -85,9 +85,11 @@ try {
         output,
       ],
       { stdio: "inherit" },
-    ).on("exit", (code) =>
-      code === 0 ? resolve() : reject(new Error("ffmpeg exited " + code)),
-    ),
+    )
+      .once("error", reject)
+      .once("close", (code) =>
+        code === 0 ? resolve() : reject(new Error("ffmpeg exited " + code)),
+      ),
   );
   console.log("Wrote", output);
 } finally {
