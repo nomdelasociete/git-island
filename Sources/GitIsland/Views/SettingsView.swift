@@ -260,6 +260,18 @@ private struct AccountAvatar: View {
 
 private struct AppearanceSettingsPane: View {
     @ObservedObject var store: GitIslandStore
+
+    var body: some View {
+        Form {
+            IslandAppearanceSections(store: store)
+        }
+        .formStyle(.grouped)
+    }
+}
+
+/// Used by both first-run setup and Settings so every style and control stays available.
+struct IslandAppearanceSections: View {
+    @ObservedObject var store: GitIslandStore
     @State private var previewSample: OutlinePreviewSample = .each
 
     private var crazyAnimationsSelection: Binding<Bool> {
@@ -308,10 +320,11 @@ private struct AppearanceSettingsPane: View {
     }
 
     var body: some View {
-        Form {
+        Group {
             Section {
                 VStack(spacing: 12) {
                     OutlinePreview(counts: previewCounts, style: store.outlineLaneStyle)
+                        .frame(maxWidth: 320)
                         .frame(maxWidth: .infinity)
 
                     Picker("Preview", selection: $previewSample) {
@@ -339,6 +352,7 @@ private struct AppearanceSettingsPane: View {
                         Text(appearance.label).tag(appearance)
                     }
                 }
+                .pickerStyle(.segmented)
 
                 if store.outlineLaneStyle.appearance == .halo {
                     LabeledContent("Halo strength") {
@@ -389,9 +403,9 @@ private struct AppearanceSettingsPane: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button("Reset to Defaults") {
-                        store.updateOutlineLaneStyle(.standard)
+                        store.updateOutlineLaneStyle(resetStyle)
                     }
-                    .disabled(store.outlineLaneStyle == .standard)
+                    .disabled(store.outlineLaneStyle == resetStyle)
                 }
             }
 
@@ -408,7 +422,12 @@ private struct AppearanceSettingsPane: View {
                 Text("Animations")
             }
         }
-        .formStyle(.grouped)
+    }
+
+    private var resetStyle: OutlineLaneStyle {
+        var style = OutlineLaneStyle.standard
+        style.appearance = store.outlineLaneStyle.appearance
+        return style
     }
 
     private func points(_ value: CGFloat) -> String {

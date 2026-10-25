@@ -22,7 +22,7 @@
   onboarding is remembered; GitHub 401 responses reopen connection recovery
   without resetting preferences. Temporary network errors do not reopen it.
   Compile and unit validation completed; visual validation on notched hardware
-  remains pending.
+  remains pending. Existing line settings are retained; choosing Halo is explicit.
 
 - Native macOS app with an AppKit borderless panel anchored to the real MacBook
   notch area.
@@ -93,7 +93,7 @@
   fetch. Settings lists the typed allowlist, muted repositories, and hidden
   pull requests.
 - Settings is a sidebar window (General, Appearance, Sounds, Refresh,
-  Repositories). Appearance offers Halo (default), Lines, and Minimal. Halo
+  Repositories). Appearance and onboarding share Lines (the existing default), Halo, and Minimal. Halo
   has persisted strength and transparency sliders; Lines retains width, spacing,
   and lane-limit controls. The live preview includes one of each status, single
   colors, unequal counts, and an empty inbox. Halo and Minimal show proportions,

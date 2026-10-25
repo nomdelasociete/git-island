@@ -192,7 +192,7 @@ enum IslandDesignSystem {
 }
 
 enum IslandOutlineAppearance: String, CaseIterable, Identifiable {
-    case halo, lines, minimal
+    case lines, halo, minimal
 
     var id: String { rawValue }
     var label: String {
@@ -210,7 +210,7 @@ struct OutlineLaneStyle: Equatable {
     static let widthRange: ClosedRange<CGFloat> = 0.75...3
     static let gapRange: ClosedRange<CGFloat> = 0...3
     static let maxLanesRange = 1...10
-    static let standard = OutlineLaneStyle(width: 1.5, gap: 1, maxLanes: 5, appearance: .halo)
+    static let standard = OutlineLaneStyle(width: 1.5, gap: 1, maxLanes: 5, appearance: .lines)
 
     var width: CGFloat
     var gap: CGFloat
