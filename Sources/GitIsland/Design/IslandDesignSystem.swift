@@ -191,19 +191,43 @@ enum IslandDesignSystem {
 
 }
 
-/// Each pull request draws one lane: the first hugs the notch, the rest stack
-/// outward, so a status's thickness shows its absolute count. Past `maxLanes`
-/// a status's lanes fuse into one band of the same footprint. All three
-/// values are user settings.
+enum IslandOutlineAppearance: String, CaseIterable, Identifiable {
+    case halo, lines, minimal
+
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .halo: "Halo"
+        case .lines: "Lines"
+        case .minimal: "Minimal"
+        }
+    }
+}
+
+/// Appearance settings share status proportions. Lines also encode absolute
+/// counts with stacked tracks; Halo and Minimal use one track per status.
 struct OutlineLaneStyle: Equatable {
     static let widthRange: ClosedRange<CGFloat> = 0.75...3
     static let gapRange: ClosedRange<CGFloat> = 0...3
     static let maxLanesRange = 1...10
-    static let standard = OutlineLaneStyle(width: 1.5, gap: 1, maxLanes: 5)
+    static let standard = OutlineLaneStyle(width: 1.5, gap: 1, maxLanes: 5, appearance: .halo)
 
     var width: CGFloat
     var gap: CGFloat
     var maxLanes: Int
+    var appearance: IslandOutlineAppearance = .lines
+    var haloStrength: CGFloat = 0.65
+    var haloTransparency: CGFloat = 0.15
+
+    var haloOpacity: Double { Double(1 - haloTransparency) }
+    var haloBlur: CGFloat { 5 + haloStrength * 11 }
+    var haloStroke: CGFloat { 4 + haloStrength * 45 }
+
+    /// Single-track styles do not encode volume with stacked lanes.
+    var renderingStyle: OutlineLaneStyle {
+        guard appearance != .lines else { return self }
+        return OutlineLaneStyle(width: appearance == .minimal ? 1.2 : 1.5, gap: 0, maxLanes: 1, appearance: appearance)
+    }
 
     var pitch: CGFloat { width + gap }
 
@@ -211,19 +235,28 @@ struct OutlineLaneStyle: Equatable {
         OutlineLaneStyle(
             width: min(Self.widthRange.upperBound, max(Self.widthRange.lowerBound, width)),
             gap: min(Self.gapRange.upperBound, max(Self.gapRange.lowerBound, gap)),
-            maxLanes: min(Self.maxLanesRange.upperBound, max(Self.maxLanesRange.lowerBound, maxLanes))
+            maxLanes: min(Self.maxLanesRange.upperBound, max(Self.maxLanesRange.lowerBound, maxLanes)),
+            appearance: appearance,
+            haloStrength: haloStrength.isFinite ? min(1, max(0, haloStrength)) : Self.standard.haloStrength,
+            haloTransparency: haloTransparency.isFinite ? min(1, max(0, haloTransparency)) : Self.standard.haloTransparency
         )
     }
 
     /// Distance from the surface edge to a lane's centerline, positive inward.
     /// Lane 0 hugs the physical notch; later lanes sit outside the surface.
     func inset(ofLane index: Int) -> CGFloat {
-        IslandDesignSystem.compactOutlineOutset - width / 2 - CGFloat(index) * pitch
+        if appearance != .lines { return width / 2 }
+        return IslandDesignSystem.compactOutlineOutset - width / 2 - CGFloat(index) * pitch
     }
 
-    /// Host room needed below the surface for the outermost lane and the
-    /// black backing that follows it.
+    /// Actual decorative extent below the surface, excluded from hit testing.
     func room(laneCount: Int) -> CGFloat {
+        guard laneCount > 0 else { return 0 }
+        if appearance == .halo {
+            guard haloStrength > 0, haloTransparency < 1 else { return 0 }
+            return (haloStroke / 2 + haloBlur * 3).rounded(.up)
+        }
+        if appearance == .minimal { return 0 }
         guard laneCount > 1 else { return 0 }
         let backingHalfWidth = (pitch + width) / 2
         return max(0, (backingHalfWidth - inset(ofLane: laneCount - 1)).rounded(.up))

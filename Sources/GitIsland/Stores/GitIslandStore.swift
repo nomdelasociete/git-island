@@ -479,7 +479,7 @@ final class GitIslandStore: ObservableObject {
         )
     }
 
-    /// The host keeps room below the surface for lanes stacked past the outset.
+    /// Decorative room below the surface is never part of pointer hit testing.
     var panelFrameSize: CGSize {
         CGSize(width: islandWidth, height: panelChromeHeight + outlineLaneRoom)
     }

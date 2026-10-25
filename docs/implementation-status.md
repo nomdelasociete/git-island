@@ -93,8 +93,12 @@
   fetch. Settings lists the typed allowlist, muted repositories, and hidden
   pull requests.
 - Settings is a sidebar window (General, Appearance, Sounds, Refresh,
-  Repositories). Appearance has a live outline preview and lets the user set
-  lane width, spacing, and the lane limit before lanes fuse.
+  Repositories). Appearance offers Halo (default), Lines, and Minimal. Halo
+  has persisted strength and transparency sliders; Lines retains width, spacing,
+  and lane-limit controls. The live preview includes one of each status, single
+  colors, unequal counts, and an empty inbox. Halo and Minimal show proportions,
+  while Lines also encodes volume. Native notched-hardware validation of the halo
+  remains pending.
 - General settings offer opt-in launch at login using macOS login item
   registration, with system approval guidance and registration error feedback.
 - Per-event sounds (new PR, ready, blocked, waiting, checks running, merged):
