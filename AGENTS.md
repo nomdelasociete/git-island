@@ -213,7 +213,11 @@ Without live enrollment, refresh is local-only and adaptive. Use prompt event-dr
 a short minimum spacing, for app focus, island interaction, wake, network return,
 and merge; temporary 20-30s bursts for fresh activity or running checks; then
 fall back to the saved idle interval (`UserPreferences`). Optional enrolled relay
-connections trigger fresh GitHub reads; polling remains the fallback. The hosted
+connections in legacy mode trigger fresh GitHub reads; polling remains their fallback.
+With separately authorized server inbox sync enabled, read Relay snapshots only,
+including during stream outages; do not silently fall back to GitHub inbox reads.
+Merge and branch-update actions remain native GitHub writes. Numeric GitHub identity
+must match the verified device identity before accepting a snapshot. The hosted
 service is separate from this client. Document changes to trust boundaries and
 data flows in PRIVACY.md; do not introduce new services without a product decision.
 

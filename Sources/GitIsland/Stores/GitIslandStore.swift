@@ -1,3 +1,4 @@
+import AppKit
 import Combine
 import CoreGraphics
 import Foundation
@@ -53,6 +54,8 @@ final class GitIslandStore: ObservableObject {
         !UserPreferences.relayOrigin.isEmpty &&
         (relayConfiguration != nil || relayDevice.hasSavedEnrollment || relayDevice.legacyExpired)
     }
+    @Published private(set) var relayInboxEnabled = UserPreferences.relayInboxEnabled
+    @Published private(set) var relayInboxSetupBusy = false
     let relayDevice = RelayDeviceSession()
     private var relayDeviceObservation: AnyCancellable?
     var currentRelayConfiguration: RelayConfiguration? {
@@ -64,7 +67,7 @@ final class GitIslandStore: ObservableObject {
     }
 
     var automaticRefreshTitle: String {
-        if isAuthenticated && githubRefreshPaused { return "Waiting for GitHub’s rate limit" }
+        if isAuthenticated && githubRefreshPaused { return relayInboxEnabled ? "Inbox sync paused" : "Waiting for GitHub’s rate limit" }
         guard isAuthenticated else { return "Sign in to enable updates" }
         switch relayConnectionState {
         case .connected: return "Live updates active"
@@ -79,10 +82,12 @@ final class GitIslandStore: ObservableObject {
         guard isAuthenticated else { return "Connect your GitHub account to keep your inbox updated." }
         if githubRefreshPaused, let nextAllowedRefreshDate {
             let retry = Self.timeFormatter.string(from: nextAllowedRefreshDate)
+            if relayInboxEnabled { return "Server synchronization will retry after \(retry). This Mac keeps its last inbox and does not fall back to GitHub reads." }
             return relayConnected
                 ? "Live updates are connected, but GitHub reads are paused until \(retry). Notifications cannot bypass this limit."
                 : "GitHub reads are paused until \(retry). Automatic checks will resume after this limit clears."
         }
+        if relayInboxEnabled { return "Relay synchronizes your inbox, including repositories without live events. This Mac reads Relay; merge and branch-update actions go directly to GitHub." }
         switch relayConnectionState {
         case .connected:
             return "A live notification triggers a fresh read from GitHub. Scheduled checks are paused while connected."
@@ -937,6 +942,41 @@ final class GitIslandStore: ObservableObject {
         if autoRefreshEnabled { restartAutoRefresh() }
     }
 
+    func authorizeRelayInbox() {
+        guard let configuration = currentRelayConfiguration, !relayInboxSetupBusy else { return }
+        relayInboxSetupBusy = true
+        Task {
+            defer { relayInboxSetupBusy = false }
+            do {
+                let url = try await RelayInboxClient(configuration: configuration).authorizationURL()
+                guard currentRelayConfiguration == configuration else { return }
+                guard NSWorkspace.shared.open(url) else { throw RelayInboxError.invalidResponse }
+                relayInboxEnabled = true
+                UserPreferences.relayInboxEnabled = true
+                nextAllowedRefreshDate = nil
+                restartAutoRefresh()
+                refresh(force: true)
+            } catch { lastError = error.localizedDescription }
+        }
+    }
+
+    func revokeRelayInbox() {
+        guard let configuration = currentRelayConfiguration, !relayInboxSetupBusy else { return }
+        relayInboxSetupBusy = true
+        Task {
+            defer { relayInboxSetupBusy = false }
+            do {
+                try await RelayInboxClient(configuration: configuration).revoke()
+                guard currentRelayConfiguration == configuration else { return }
+                relayInboxEnabled = false
+                UserPreferences.relayInboxEnabled = false
+                nextAllowedRefreshDate = nil
+                restartAutoRefresh()
+                refresh(force: true)
+            } catch { lastError = error.localizedDescription }
+        }
+    }
+
     private func startRelay() {
         relayDevice.activate(origin: UserPreferences.relayOrigin)
         relayConfiguration = currentRelayConfiguration
@@ -945,7 +985,7 @@ final class GitIslandStore: ObservableObject {
             return
         }
         relayConnectionState = .connecting
-        relayStream.start(configuration: relayConfiguration) { [weak self] event in
+        relayStream.start(configuration: relayConfiguration, inbox: relayInboxEnabled) { [weak self] event in
             guard let self, self.autoRefreshEnabled else { return }
             if event == .expired {
                 self.relayStream.stop()
@@ -1045,7 +1085,7 @@ final class GitIslandStore: ObservableObject {
     private func scheduleNextAutoRefresh() {
         autoRefreshTask?.cancel()
 
-        guard isAuthenticated, autoRefreshEnabled, !relayConnected else {
+        guard isAuthenticated, autoRefreshEnabled, !relayConnected || relayInboxEnabled else {
             autoRefreshTask = nil
             refreshDiagnostics = refreshDiagnostics.withNextScheduledRefresh(nil)
             return
@@ -1082,6 +1122,7 @@ final class GitIslandStore: ObservableObject {
             return max(Self.minimumRefreshSpacing, nextAllowedRefreshDate.timeIntervalSince(now))
         }
 
+        if relayInboxEnabled { return 30 }
         if hasRelayConfiguration { return 60 }
 
         let hasTesting = pullRequests.contains(where: { $0.group == .testing })
@@ -1159,7 +1200,7 @@ final class GitIslandStore: ObservableObject {
             guard let nextAllowedRefreshDate else {
                 return
             }
-            lastError = Self.rateLimitMessage(until: nextAllowedRefreshDate)
+            lastError = relayInboxEnabled ? "Relay inbox sync is paused until the next allowed retry." : Self.rateLimitMessage(until: nextAllowedRefreshDate)
             refreshDiagnostics = refreshDiagnostics
                 .withNextScheduledRefresh(nextAllowedRefreshDate)
                 .withLastMessage(lastError)
@@ -1190,13 +1231,24 @@ final class GitIslandStore: ObservableObject {
         let currentLogin = githubLogin
         let repositoryFullNames = repositoryFilterMode == .selected ? selectedRepositoryFullNames : nil
 
+        let inboxEnabled = relayInboxEnabled
+        let inboxConfiguration = currentRelayConfiguration
+        let inboxSubject = relayDevice.inboxSubject
         refreshTask = Task { [service, currentLogin, repositoryFullNames] in
             do {
                 let fetchStart = Date()
-                let pullRequests = try await service.fetchPullRequests(
-                    currentLogin: currentLogin,
-                    repositoryFullNames: repositoryFullNames
-                )
+                let pullRequests: [PullRequest]
+                if inboxEnabled {
+                    guard let inboxConfiguration, let currentLogin, let inboxSubject else { throw RelayInboxError.deviceNotReady }
+                    let snapshot = try await RelayInboxClient(configuration: inboxConfiguration).fetch(login: currentLogin, subject: inboxSubject, refresh: reason == .merge || reason == .updateBranch || reason == .manual)
+                    let inbox = service.inboxPullRequests(from: snapshot.data, currentLogin: snapshot.login)
+                    if let repositoryFullNames {
+                        let names = Set(repositoryFullNames.map { $0.lowercased() })
+                        pullRequests = inbox.filter { names.contains($0.repositoryFullName.lowercased()) }
+                    } else { pullRequests = inbox }
+                } else {
+                    pullRequests = try await service.fetchPullRequests(currentLogin: currentLogin, repositoryFullNames: repositoryFullNames)
+                }
                 let fetchEnd = Date()
                 let fetchDuration = fetchEnd.timeIntervalSince(fetchStart)
                 let hits304 = await service.last304HitCount
@@ -1271,6 +1323,13 @@ final class GitIslandStore: ObservableObject {
                     self.refreshTask = nil
                     self.refreshRequestID = nil
                     let finishedAt = Date()
+                    if let relayError = error as? RelayInboxError {
+                        switch relayError {
+                        case .deviceExpired: self.relayDevice.accessExpired()
+                        case .unavailable(let date): self.nextAllowedRefreshDate = date
+                        case .authorizationRequired, .deviceNotReady, .invalidResponse: break
+                        }
+                    }
                     if let gitHubError = error as? GitHubServiceError,
                        gitHubError.isRateLimited {
                         let minimumRetryDate = Date().addingTimeInterval(Self.minimumRefreshSpacing)

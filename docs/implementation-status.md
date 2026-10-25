@@ -240,3 +240,20 @@ verified SHA-256. Future releases must bump its version and checksum in the tap.
 The cask passes Homebrew style and online audit, and installs successfully into
 an isolated application directory. The installed app passes Gatekeeper; it was
 not launched, and the temporary installation was removed after verification.
+
+
+## Prepared server inbox synchronization
+
+The optional server inbox path reads Relay snapshots after a separate browser
+OAuth grant. Merge and branch-update writes remain native. Local repository
+filters apply to the received inbox, not to server reads. Old clients and users
+who have not opted in keep their previous local-read behavior. Relay handles
+per-user coalescing, targeted webhook invalidations, reconciliation for uncovered
+repositories, and persistent provider backoff. Native GraphQL rate-limit errors
+no longer trigger REST fallback.
+
+This is prepared code, not a production rollout. The coordinated Relay change,
+separate OAuth App registration/configuration, real account/organization coverage,
+revocation and latency validation, and updated hosted-service disclosures must
+be verified before enabling it for users. No app launch or distribution is part
+of this work.

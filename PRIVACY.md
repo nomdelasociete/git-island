@@ -45,6 +45,48 @@ relay sessions reject redirects; GitHub requests use ephemeral, uncached session
 Wake hooks are optional. Their URL is saved in preferences; their secret is
 shown on creation. Forgetting the URL locally does not revoke the remote hook.
 
+## Optional server inbox synchronization
+
+After device enrollment, a separate, explicit browser authorization enables
+server inbox synchronization. This is a separate OAuth App grant; the native
+GitHub token stays on the Mac. Private PR coverage outside GitHub App
+installations requires GitHub's broad `read:user repo` scope. That scope includes
+write permissions; the Relay inbox implementation exposes only fixed GraphQL
+reads. Merge and branch-update requests continue directly from the Mac to GitHub.
+Organization policies and SSO may still restrict the server grant's coverage.
+
+When enabled, the Mac reads authenticated snapshots from the authority origin.
+It checks Relay every 30 seconds and after live notifications; Relay coalesces
+requests across computers of the same product and GitHub numeric identity.
+It does not fall back to direct GitHub inbox reads during a Relay outage.
+The separate GitHub identity verification during device enrollment/renewal remains.
+The typed repository allowlist filters this server inbox on the Mac: it does not
+limit which PRs the server reads. Local-only mode retains its existing query filter.
+
+Relay stores an encrypted OAuth credential and encrypted current PR metadata:
+titles, URLs, repository identities, head SHAs, review states/authors/timestamps,
+check names/statuses, and viewer-specific permissions. It does not request code,
+PR bodies, review text or a durable event history. Data is isolated by product and
+GitHub numeric identity, not shared between users. Cached snapshots are deleted
+after 24 hours without synchronization; credentials expire from server storage
+after 90 days without synchronization. Alarm execution can be delayed by the
+platform. Requests enforce credential expiry independently of alarms.
+
+A cached snapshot can be served for up to 60 seconds between full provider reads.
+Webhook updates target the affected repository and are grouped with at least
+five seconds between reads. Permission changes not observed through revocation
+may therefore take up to the next full read to remove cached data. Provider
+authorization failures fail closed; provider errors pause reads rather than serve
+an older snapshot from the server. The Mac keeps its already displayed inbox.
+
+“Revoke server inbox and resume local checks” deletes the stored server grant and
+snapshot for this user/product, affecting their other Macs too. It also cancels
+pending inbox authorizations. This does not revoke the OAuth grant at GitHub;
+remove that grant in GitHub settings separately. Signing out or revoking one
+Mac's live access does not delete another Mac's server inbox authorization.
+Server operator logs/backups and production privacy disclosures still need
+verification before rollout; this implementation does not establish those claims.
+
 ## Local data and support
 
 Appearance/sound settings persist locally. Imported sound files are copied into
