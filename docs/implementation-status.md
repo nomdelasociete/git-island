@@ -315,3 +315,27 @@ were read back and verified. This verifies distribution availability, not a new
 TestFlight installation or runtime launch. Homebrew tap PR #2 was merged on
 26 October 2026. The website update remains in PR #17, pending review and merge
 before CI deployment.
+
+
+## Automatic application updates (prepared)
+
+Settings now reads the actual bundle version/build instead of the stale
+`2026-06-28a` label. A separate GitIslandDirect Xcode target embeds Sparkle 2.10.1
+for Developer ID distribution; the TestFlight target does not include it.
+Direct Release builds enable automatic checks/downloads, user controls and a
+manual menu action, with Ed25519 archive verification before extraction and the
+sandbox installer service. The signing key is in the release operator's Keychain.
+The website has an initially empty public appcast; the local preparation script
+generates signed entries from notarized DMGs without publishing anything.
+
+This is not yet a distributed updater. Existing 0.15 installations need one
+manual upgrade. Signed old-to-new runtime acceptance and an explicitly authorized
+new release remain required before announcing automatic updates as available.
+
+Validation: 127 ordinary Swift tests pass, as do the unsigned Debug build and
+both Release builds. Inspection of built bundles confirms the direct updater's
+boolean configuration, embedded installer service and public key, and the
+absence of Sparkle/configuration from the Apple build. The website build includes
+the appcast. A signed synthetic file verifies successfully and a modified copy
+fails verification; feed checks reject insecure URLs, missing signatures and
+archive-length mismatches. These checks do not replace installation acceptance.

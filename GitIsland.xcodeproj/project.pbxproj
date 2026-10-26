@@ -10,43 +10,88 @@
 		007D9B6D69D0320E4369F890 /* IslandDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E533B04CCEA9EBF11420E6 /* IslandDesignSystem.swift */; };
 		00985E28036320FBBB27EB14 /* StatusChangeCueController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4E95B24D1E8C11BCEC389C /* StatusChangeCueController.swift */; };
 		088921AF0AB80614A4BA719E /* GitHubAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9AB0629BA2E498A6288FCE /* GitHubAuthService.swift */; };
+		08C8F67E151914788B8627BF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B97BD11D7AB5910ECDDF31D /* SettingsView.swift */; };
+		0F97C7D03296C99E098560CB /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5FD425305A4C6C7AE89A6C /* SettingsWindowController.swift */; };
+		13608E89C136E5303BCC98D8 /* IslandSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C9D8F38F289CB786E8AC52 /* IslandSound.swift */; };
 		167814C409BE2F0A09FFEBCF /* GitIslandMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21DE71D99CF961F4BAE8D73 /* GitIslandMenuView.swift */; };
+		1D20F897B117386D3339707D /* GitHubOAuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8A3C849C68254AE3C33534 /* GitHubOAuthConfiguration.swift */; };
 		235E1DC4D1B15FD80F65CB59 /* RelayStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3016B6F4ED184350F6C935 /* RelayStream.swift */; };
+		241FAD0D3F04AE80EB757EF6 /* IslandSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E368CE235BA6836252593CFF /* IslandSoundPlayer.swift */; };
+		2D5DF20C0DB9178D92EF038D /* MergeConfettiController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D23B6058CDE0811113330DF /* MergeConfettiController.swift */; };
 		3136062AB15A2EBFE6F98910 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B97BD11D7AB5910ECDDF31D /* SettingsView.swift */; };
+		32252BDA0DE6AEDA3AA85D82 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EBDDA141015B92E5F7FC61 /* UserPreferences.swift */; };
+		35524B5748728EE5D4A0F778 /* OnboardingWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 974E85087765FE2FAFE8305A /* OnboardingWindowController.swift */; };
+		361E40607B0CB20AF5C3FB17 /* onboarding-island.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B90DD302FEB5348A9B149B4 /* onboarding-island.png */; };
 		3AD49261D5D3167B1CEC4D51 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F5A0B1DA09209A19128946 /* TokenStore.swift */; };
+		3EDD00F0B2D83A2768DCEE1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34C455B8233FF49E6B5994ED /* Assets.xcassets */; };
+		40986EA16192C5CF927E5E69 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 6EDC2FF478CB6DE48A7F6CCF /* Sparkle */; };
+		46D92DF94C84332B41BEE8E8 /* IslandDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E533B04CCEA9EBF11420E6 /* IslandDesignSystem.swift */; };
+		472380FD872C7C9E4070BED6 /* PullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F30EC1A6420E86D4904A3C9 /* PullRequest.swift */; };
+		489B30AE2D5266C3F83CC08B /* InboxFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F386353D307B4E8570A33C94 /* InboxFilter.swift */; };
+		4B30A7BD91676FA7DA2DA75F /* OnboardingDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88292D010AD5332C4A055B1C /* OnboardingDesign.swift */; };
 		5233B96A3C48F665B9439DDF /* RelayInboxClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376281B2ACD1E37437D2452B /* RelayInboxClient.swift */; };
+		5584C85FCE25A9B4DAAA1809 /* AppUpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EACB6FFFA7721BDAA09719 /* AppUpdateService.swift */; };
 		58F68872FEBC1498F0A55FAA /* IslandSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C9D8F38F289CB786E8AC52 /* IslandSound.swift */; };
 		61CE7B294D6CFCA208320DF6 /* GitIslandStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CB306328641020890C99F6 /* GitIslandStore.swift */; };
 		63ED7E0BFD3B60AA57463609 /* IslandPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E924AFE1180DEA11B9EB5E /* IslandPanelController.swift */; };
+		653AF9BED761E9BE83C8807B /* GitIslandMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21DE71D99CF961F4BAE8D73 /* GitIslandMenuView.swift */; };
+		6764B6AFB956A9C55EC439EF /* AppUpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EACB6FFFA7721BDAA09719 /* AppUpdateService.swift */; };
 		69B2B1ACF27FFF083B5329CF /* InboxFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F386353D307B4E8570A33C94 /* InboxFilter.swift */; };
+		6D3302CCA443C60E7EB7F43A /* StatusChangeCueController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4E95B24D1E8C11BCEC389C /* StatusChangeCueController.swift */; };
+		6E433D185A7509C37580DF90 /* git-merge-mark.svg in Resources */ = {isa = PBXBuildFile; fileRef = 03196CFFE36F27B3441EE843 /* git-merge-mark.svg */; };
 		705937266909A06983C84335 /* GitHubOAuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8A3C849C68254AE3C33534 /* GitHubOAuthConfiguration.swift */; };
+		718E363D5A16F4678314BEF7 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F5A0B1DA09209A19128946 /* TokenStore.swift */; };
 		72B6EA2ADBBD45616C370693 /* git-island-menu-bar.svg in Resources */ = {isa = PBXBuildFile; fileRef = F9A8FEDB6DBACD11B1E51CD6 /* git-island-menu-bar.svg */; };
+		7368FB822C2AEC561D8363B6 /* AppUpdateSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5535482CCF52C578A1C39851 /* AppUpdateSettings.swift */; };
+		742F6E07412946A3DF73FD09 /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B1484F2BC17331354747EB3 /* KeychainTokenStore.swift */; };
+		7D136D31ACD87B32CD3F614B /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3BDDFF19FE015AF4AA85B8 /* AppVersion.swift */; };
+		7FC95EA576A1A9A021FCB96B /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = AE7D107ABBDF4DB6BC0135DB /* LICENSE */; };
 		7FFBA998907A55B33E15F966 /* RelayDeviceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14C2D1F194C162858F2B516 /* RelayDeviceSession.swift */; };
+		80957176B22B10D5B519B680 /* GitHubAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9AB0629BA2E498A6288FCE /* GitHubAuthService.swift */; };
 		81BBA30BE7B9E48A34F0780C /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5FD425305A4C6C7AE89A6C /* SettingsWindowController.swift */; };
+		8504A4BFCE00CF8A63C8AAAF /* RelayDeviceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = D14C2D1F194C162858F2B516 /* RelayDeviceSession.swift */; };
+		86AF8CC73F2BB1B3ACA8DA7B /* GitHubTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763DCC271E265FD65BF7F4D /* GitHubTransport.swift */; };
 		8C3E2B32452366640553A0B1 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EF04F28DCFC0000BCB5BDA /* OnboardingView.swift */; };
 		8DE809314FEC7502079804DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34C455B8233FF49E6B5994ED /* Assets.xcassets */; };
+		9045635BD24E2C7E506CE895 /* GitHubPullRequestService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7DCF20AF06569ACCAB6977 /* GitHubPullRequestService.swift */; };
 		9136F0DB351C2BD21AB8F02F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 12EA4E552695646AE1C642E7 /* PrivacyInfo.xcprivacy */; };
+		95D6C90C6E8AF5772862460E /* THIRD_PARTY_NOTICES.md in Resources */ = {isa = PBXBuildFile; fileRef = 5236709179B9F695E422EB61 /* THIRD_PARTY_NOTICES.md */; };
+		9694E41F2B61F6DFDCAA39EE /* GitIslandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03AE9839C0098670ACC81B /* GitIslandApp.swift */; };
+		97AEFF91E8037DB8253C4408 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 12EA4E552695646AE1C642E7 /* PrivacyInfo.xcprivacy */; };
 		9996AB552FA5F87EBD722A1E /* git-merge-mark.svg in Resources */ = {isa = PBXBuildFile; fileRef = 03196CFFE36F27B3441EE843 /* git-merge-mark.svg */; };
 		9CF29CA1E3A213D70A7C6FBB /* GitHubPullRequestService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7DCF20AF06569ACCAB6977 /* GitHubPullRequestService.swift */; };
 		9D4CAA71DEF4A0D4F1B33307 /* THIRD_PARTY_NOTICES.md in Resources */ = {isa = PBXBuildFile; fileRef = 5236709179B9F695E422EB61 /* THIRD_PARTY_NOTICES.md */; };
+		9F4E908B3CADAA2EDEF182FA /* IslandPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E924AFE1180DEA11B9EB5E /* IslandPanelController.swift */; };
 		9F936320A528CFF69022AEBE /* GitHubTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763DCC271E265FD65BF7F4D /* GitHubTransport.swift */; };
+		A0C1F60EA32646D98769DB50 /* RelayInboxClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376281B2ACD1E37437D2452B /* RelayInboxClient.swift */; };
 		A14B3BDE4814B17B0E8FDBE1 /* OnboardingWelcomeContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F719804CA4233E90F4042708 /* OnboardingWelcomeContent.swift */; };
 		A640B5312CE1DE1702878EB5 /* IslandHostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16717AFDAFEB28B3EAB31FF /* IslandHostView.swift */; };
 		AA745460DBCF5C5D596ED754 /* IslandStatusOutline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EBBC53467F72650DAA7982 /* IslandStatusOutline.swift */; };
+		B448BFBF9F61537AD8317912 /* RelayStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3016B6F4ED184350F6C935 /* RelayStream.swift */; };
 		B4DDE7078B8AB9B24D2A5D44 /* MergeConfettiController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D23B6058CDE0811113330DF /* MergeConfettiController.swift */; };
+		B667D199773A52F3974C5855 /* GitIslandStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CB306328641020890C99F6 /* GitIslandStore.swift */; };
+		B79898081AFE8D2126594F72 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EF04F28DCFC0000BCB5BDA /* OnboardingView.swift */; };
 		B922D84C3F872C9E24E404E9 /* OnboardingDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88292D010AD5332C4A055B1C /* OnboardingDesign.swift */; };
 		BF8DA8A9F78FA06A2E35C756 /* git-island-logo.png in Resources */ = {isa = PBXBuildFile; fileRef = C8C48312C2D7263B637DAC04 /* git-island-logo.png */; };
 		C139049F6B9362ED4EF492C9 /* PullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F30EC1A6420E86D4904A3C9 /* PullRequest.swift */; };
+		C1F9E94F1B73CA2B8569D28B /* OnboardingWelcomeContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F719804CA4233E90F4042708 /* OnboardingWelcomeContent.swift */; };
+		C697081A6A729126DFA7448F /* IslandHostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16717AFDAFEB28B3EAB31FF /* IslandHostView.swift */; };
 		C8898032B84621D674F416C2 /* onboarding-island.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B90DD302FEB5348A9B149B4 /* onboarding-island.png */; };
+		C93B3DC6BFFFE3041BB59ED6 /* git-island-menu-bar.svg in Resources */ = {isa = PBXBuildFile; fileRef = F9A8FEDB6DBACD11B1E51CD6 /* git-island-menu-bar.svg */; };
 		CB63E6BFEB98087F1F201FD5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = AE7D107ABBDF4DB6BC0135DB /* LICENSE */; };
+		CD2AD146972280A640465803 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3BDDFF19FE015AF4AA85B8 /* AppVersion.swift */; };
 		D163FCC67E4CBA50191B3DF4 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EBDDA141015B92E5F7FC61 /* UserPreferences.swift */; };
+		D88785B5D0C26EE74C4960B3 /* AppUpdateSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5535482CCF52C578A1C39851 /* AppUpdateSettings.swift */; };
+		DC3E5685FE4DA3D00B29AC3A /* IslandStatusOutline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EBBC53467F72650DAA7982 /* IslandStatusOutline.swift */; };
 		E913C112345F878B92A07A5E /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B1484F2BC17331354747EB3 /* KeychainTokenStore.swift */; };
 		F001E1A3CD678427933C41D3 /* IslandSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E368CE235BA6836252593CFF /* IslandSoundPlayer.swift */; };
 		F06A2A9A9A0DF5BCB93D86B2 /* OnboardingWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 974E85087765FE2FAFE8305A /* OnboardingWindowController.swift */; };
+		F15B98F41B7D8BB83C426CE5 /* git-island-logo.png in Resources */ = {isa = PBXBuildFile; fileRef = C8C48312C2D7263B637DAC04 /* git-island-logo.png */; };
 		F250DC9CA704B0A0FBF4F4D3 /* GitIslandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03AE9839C0098670ACC81B /* GitIslandApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		00EACB6FFFA7721BDAA09719 /* AppUpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateService.swift; sourceTree = "<group>"; };
 		03196CFFE36F27B3441EE843 /* git-merge-mark.svg */ = {isa = PBXFileReference; path = "git-merge-mark.svg"; sourceTree = "<group>"; };
 		07EF04F28DCFC0000BCB5BDA /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		0F30EC1A6420E86D4904A3C9 /* PullRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullRequest.swift; sourceTree = "<group>"; };
@@ -60,9 +105,11 @@
 		4E8A3C849C68254AE3C33534 /* GitHubOAuthConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubOAuthConfiguration.swift; sourceTree = "<group>"; };
 		5236709179B9F695E422EB61 /* THIRD_PARTY_NOTICES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = THIRD_PARTY_NOTICES.md; sourceTree = "<group>"; };
 		52EBBC53467F72650DAA7982 /* IslandStatusOutline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandStatusOutline.swift; sourceTree = "<group>"; };
+		5535482CCF52C578A1C39851 /* AppUpdateSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateSettings.swift; sourceTree = "<group>"; };
 		5B03AE9839C0098670ACC81B /* GitIslandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitIslandApp.swift; sourceTree = "<group>"; };
 		5B90DD302FEB5348A9B149B4 /* onboarding-island.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "onboarding-island.png"; sourceTree = "<group>"; };
 		60C9D8F38F289CB786E8AC52 /* IslandSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandSound.swift; sourceTree = "<group>"; };
+		7E3BDDFF19FE015AF4AA85B8 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
 		8763DCC271E265FD65BF7F4D /* GitHubTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubTransport.swift; sourceTree = "<group>"; };
 		88292D010AD5332C4A055B1C /* OnboardingDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingDesign.swift; sourceTree = "<group>"; };
 		974E85087765FE2FAFE8305A /* OnboardingWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWindowController.swift; sourceTree = "<group>"; };
@@ -76,6 +123,7 @@
 		C7CB306328641020890C99F6 /* GitIslandStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitIslandStore.swift; sourceTree = "<group>"; };
 		C8C48312C2D7263B637DAC04 /* git-island-logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "git-island-logo.png"; sourceTree = "<group>"; };
 		D14C2D1F194C162858F2B516 /* RelayDeviceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayDeviceSession.swift; sourceTree = "<group>"; };
+		D669E0C4E2CB73E77AB3FC5C /* GitIslandDirect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitIslandDirect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8F5A0B1DA09209A19128946 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		DE4E95B24D1E8C11BCEC389C /* StatusChangeCueController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusChangeCueController.swift; sourceTree = "<group>"; };
 		E21DE71D99CF961F4BAE8D73 /* GitIslandMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitIslandMenuView.swift; sourceTree = "<group>"; };
@@ -86,6 +134,17 @@
 		F719804CA4233E90F4042708 /* OnboardingWelcomeContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWelcomeContent.swift; sourceTree = "<group>"; };
 		F9A8FEDB6DBACD11B1E51CD6 /* git-island-menu-bar.svg */ = {isa = PBXFileReference; path = "git-island-menu-bar.svg"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9DF793E490DD4755CBEF0C24 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				40986EA16192C5CF927E5E69 /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		1179DB6C20B5B48BA9B544E9 /* Sources */ = {
@@ -135,6 +194,7 @@
 			isa = PBXGroup;
 			children = (
 				B5ECCC975C0246028CD16097 /* GitIsland.app */,
+				D669E0C4E2CB73E77AB3FC5C /* GitIslandDirect.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -152,6 +212,7 @@
 		80AB277A1CBD83D7C162E2A8 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				00EACB6FFFA7721BDAA09719 /* AppUpdateService.swift */,
 				9F9AB0629BA2E498A6288FCE /* GitHubAuthService.swift */,
 				EB7DCF20AF06569ACCAB6977 /* GitHubPullRequestService.swift */,
 				8763DCC271E265FD65BF7F4D /* GitHubTransport.swift */,
@@ -201,6 +262,7 @@
 		CCFD9F5879A1C44379DD7B01 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5535482CCF52C578A1C39851 /* AppUpdateSettings.swift */,
 				E21DE71D99CF961F4BAE8D73 /* GitIslandMenuView.swift */,
 				C16717AFDAFEB28B3EAB31FF /* IslandHostView.swift */,
 				52EBBC53467F72650DAA7982 /* IslandStatusOutline.swift */,
@@ -214,6 +276,7 @@
 		E04B3EB85C34EFADFA8B62B4 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
+				7E3BDDFF19FE015AF4AA85B8 /* AppVersion.swift */,
 				4E8A3C849C68254AE3C33534 /* GitHubOAuthConfiguration.swift */,
 				46EBDDA141015B92E5F7FC61 /* UserPreferences.swift */,
 			);
@@ -242,6 +305,27 @@
 			productReference = B5ECCC975C0246028CD16097 /* GitIsland.app */;
 			productType = "com.apple.product-type.application";
 		};
+		418959D174BE9A3B24A269EE /* GitIslandDirect */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C8BC4B304B4B0F1A877BA4B7 /* Build configuration list for PBXNativeTarget "GitIslandDirect" */;
+			buildPhases = (
+				E77B291133A6A32D1057A95B /* Sources */,
+				D8BEF956355822771EB0791F /* Resources */,
+				9DF793E490DD4755CBEF0C24 /* Frameworks */,
+				E84CC901F063A376FF88770E /* Verify menu-bar-only app */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GitIslandDirect;
+			packageProductDependencies = (
+				6EDC2FF478CB6DE48A7F6CCF /* Sparkle */,
+			);
+			productName = GitIslandDirect;
+			productReference = D669E0C4E2CB73E77AB3FC5C /* GitIslandDirect.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -252,6 +336,10 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					3C3392EEB479766A27A0A4DB = {
+						DevelopmentTeam = JSFMAD28GS;
+						ProvisioningStyle = Automatic;
+					};
+					418959D174BE9A3B24A269EE = {
 						DevelopmentTeam = JSFMAD28GS;
 						ProvisioningStyle = Automatic;
 					};
@@ -266,12 +354,16 @@
 			);
 			mainGroup = 8D98E29DCCB8AAFD85ED1B0D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				75ADF51CA131DC5AC72BEDE3 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 67754CD0643D2EF695BC45E6 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				3C3392EEB479766A27A0A4DB /* GitIsland */,
+				418959D174BE9A3B24A269EE /* GitIslandDirect */,
 			);
 		};
 /* End PBXProject section */
@@ -289,6 +381,21 @@
 				72B6EA2ADBBD45616C370693 /* git-island-menu-bar.svg in Resources */,
 				9996AB552FA5F87EBD722A1E /* git-merge-mark.svg in Resources */,
 				C8898032B84621D674F416C2 /* onboarding-island.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D8BEF956355822771EB0791F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3EDD00F0B2D83A2768DCEE1D /* Assets.xcassets in Resources */,
+				7FC95EA576A1A9A021FCB96B /* LICENSE in Resources */,
+				97AEFF91E8037DB8253C4408 /* PrivacyInfo.xcprivacy in Resources */,
+				95D6C90C6E8AF5772862460E /* THIRD_PARTY_NOTICES.md in Resources */,
+				F15B98F41B7D8BB83C426CE5 /* git-island-logo.png in Resources */,
+				C93B3DC6BFFFE3041BB59ED6 /* git-island-menu-bar.svg in Resources */,
+				6E433D185A7509C37580DF90 /* git-merge-mark.svg in Resources */,
+				361E40607B0CB20AF5C3FB17 /* onboarding-island.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +422,26 @@
 			shellPath = /bin/sh;
 			shellScript = "set -eu\nplist=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\nagent=$(/usr/libexec/PlistBuddy -c 'Print :LSUIElement' \"$plist\" 2>/dev/null || true)\nif [ \"$agent\" != \"true\" ]; then\n  echo \"error: Git Island must never appear in the Dock. Built Info.plist must declare LSUIElement=true.\"\n  exit 1\nfi\n";
 		};
+		E84CC901F063A376FF88770E /* Verify menu-bar-only app */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Verify menu-bar-only app";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nplist=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\nagent=$(/usr/libexec/PlistBuddy -c 'Print :LSUIElement' \"$plist\" 2>/dev/null || true)\nif [ \"$agent\" != \"true\" ]; then\n  echo \"error: Git Island must never appear in the Dock. Built Info.plist must declare LSUIElement=true.\"\n  exit 1\nfi\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -322,6 +449,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6764B6AFB956A9C55EC439EF /* AppUpdateService.swift in Sources */,
+				D88785B5D0C26EE74C4960B3 /* AppUpdateSettings.swift in Sources */,
+				7D136D31ACD87B32CD3F614B /* AppVersion.swift in Sources */,
 				088921AF0AB80614A4BA719E /* GitHubAuthService.swift in Sources */,
 				705937266909A06983C84335 /* GitHubOAuthConfiguration.swift in Sources */,
 				9CF29CA1E3A213D70A7C6FBB /* GitHubPullRequestService.swift in Sources */,
@@ -351,6 +481,45 @@
 				00985E28036320FBBB27EB14 /* StatusChangeCueController.swift in Sources */,
 				3AD49261D5D3167B1CEC4D51 /* TokenStore.swift in Sources */,
 				D163FCC67E4CBA50191B3DF4 /* UserPreferences.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E77B291133A6A32D1057A95B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5584C85FCE25A9B4DAAA1809 /* AppUpdateService.swift in Sources */,
+				7368FB822C2AEC561D8363B6 /* AppUpdateSettings.swift in Sources */,
+				CD2AD146972280A640465803 /* AppVersion.swift in Sources */,
+				80957176B22B10D5B519B680 /* GitHubAuthService.swift in Sources */,
+				1D20F897B117386D3339707D /* GitHubOAuthConfiguration.swift in Sources */,
+				9045635BD24E2C7E506CE895 /* GitHubPullRequestService.swift in Sources */,
+				86AF8CC73F2BB1B3ACA8DA7B /* GitHubTransport.swift in Sources */,
+				9694E41F2B61F6DFDCAA39EE /* GitIslandApp.swift in Sources */,
+				653AF9BED761E9BE83C8807B /* GitIslandMenuView.swift in Sources */,
+				B667D199773A52F3974C5855 /* GitIslandStore.swift in Sources */,
+				489B30AE2D5266C3F83CC08B /* InboxFilter.swift in Sources */,
+				46D92DF94C84332B41BEE8E8 /* IslandDesignSystem.swift in Sources */,
+				C697081A6A729126DFA7448F /* IslandHostView.swift in Sources */,
+				9F4E908B3CADAA2EDEF182FA /* IslandPanelController.swift in Sources */,
+				13608E89C136E5303BCC98D8 /* IslandSound.swift in Sources */,
+				241FAD0D3F04AE80EB757EF6 /* IslandSoundPlayer.swift in Sources */,
+				DC3E5685FE4DA3D00B29AC3A /* IslandStatusOutline.swift in Sources */,
+				742F6E07412946A3DF73FD09 /* KeychainTokenStore.swift in Sources */,
+				2D5DF20C0DB9178D92EF038D /* MergeConfettiController.swift in Sources */,
+				4B30A7BD91676FA7DA2DA75F /* OnboardingDesign.swift in Sources */,
+				B79898081AFE8D2126594F72 /* OnboardingView.swift in Sources */,
+				C1F9E94F1B73CA2B8569D28B /* OnboardingWelcomeContent.swift in Sources */,
+				35524B5748728EE5D4A0F778 /* OnboardingWindowController.swift in Sources */,
+				472380FD872C7C9E4070BED6 /* PullRequest.swift in Sources */,
+				8504A4BFCE00CF8A63C8AAAF /* RelayDeviceSession.swift in Sources */,
+				A0C1F60EA32646D98769DB50 /* RelayInboxClient.swift in Sources */,
+				B448BFBF9F61537AD8317912 /* RelayStream.swift in Sources */,
+				08C8F67E151914788B8627BF /* SettingsView.swift in Sources */,
+				0F97C7D03296C99E098560CB /* SettingsWindowController.swift in Sources */,
+				6D3302CCA443C60E7EB7F43A /* StatusChangeCueController.swift in Sources */,
+				718E363D5A16F4678314BEF7 /* TokenStore.swift in Sources */,
+				32252BDA0DE6AEDA3AA85D82 /* UserPreferences.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -446,6 +615,39 @@
 			};
 			name = Release;
 		};
+		672DD8E792EFD957EACF7CBF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "git-island-icon";
+				CODE_SIGN_ENTITLEMENTS = GitIslandDirect.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 202610260002;
+				DEVELOPMENT_TEAM = JSFMAD28GS;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "GitIslandDirect-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Git Island";
+				INFOPLIST_KEY_CFBundleName = "Git Island";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_LSMinimumSystemVersion = 26.0;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.15;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nomdelasociete.GitIsland;
+				PRODUCT_MODULE_NAME = GitIsland;
+				PRODUCT_NAME = "Git Island";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
+			};
+			name = Release;
+		};
 		74E40CE4286811C2A481AA3B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -511,6 +713,40 @@
 			};
 			name = Debug;
 		};
+		900DDC86956EE49569484D1B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "git-island-icon";
+				CODE_SIGN_ENTITLEMENTS = GitIsland.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 202610260002;
+				DEVELOPMENT_TEAM = JSFMAD28GS;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "GitIslandDirect-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Git Island Dev";
+				INFOPLIST_KEY_CFBundleName = "Git Island Dev";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_LSMinimumSystemVersion = 26.0;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.15;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nomdelasociete.GitIsland.dev;
+				PRODUCT_MODULE_NAME = GitIsland;
+				PRODUCT_NAME = "Git Island Dev";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
+			};
+			name = Debug;
+		};
 		A9501A9EFF9D46F95322809A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -555,6 +791,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		C8BC4B304B4B0F1A877BA4B7 /* Build configuration list for PBXNativeTarget "GitIslandDirect" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				900DDC86956EE49569484D1B /* Debug */,
+				672DD8E792EFD957EACF7CBF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		DAAD24304DB2E68D12230629 /* Build configuration list for PBXNativeTarget "GitIsland" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -565,6 +810,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		75ADF51CA131DC5AC72BEDE3 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.10.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6EDC2FF478CB6DE48A7F6CCF /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 75ADF51CA131DC5AC72BEDE3 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F4CFF9236628DE5D88342BB1 /* Project object */;
 }

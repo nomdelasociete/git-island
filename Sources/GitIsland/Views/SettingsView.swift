@@ -155,7 +155,9 @@ private struct GeneralSettingsPane: View {
             }
 
             Section {
-                LabeledContent("Build", value: GitIslandStore.buildStamp)
+                LabeledContent("Version", value: AppVersion.current.version)
+                LabeledContent("Build", value: AppVersion.current.build)
+                AppUpdateSettings()
             }
         }
         .formStyle(.grouped)

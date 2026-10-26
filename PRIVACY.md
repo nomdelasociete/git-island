@@ -87,6 +87,24 @@ Mac's live access does not delete another Mac's server inbox authorization.
 Server operator logs/backups and production privacy disclosures still need
 verification before rollout; this implementation does not establish those claims.
 
+## Application updates
+
+Direct-distribution builds (DMG and Homebrew) use Sparkle to check
+`https://gitis.land/appcast.xml` every four hours. Automatic checks and downloads
+are enabled by default and can be disabled in General settings. Updates install
+when the app quits; a long-running app can prompt for a restart. Manual checks
+are available in the menu and settings, independently of GitHub sign-in.
+
+The feed is public and requires no GitHub API request or token. Update archives
+are downloaded from GitHub Releases and its asset CDN over HTTPS, and their
+Ed25519 signatures are verified before extraction. Developer ID code signing
+also authenticates the replacement app. These hosts receive ordinary connection
+metadata, including IP address and updater user-agent information; no inbox,
+GitHub credential, Relay credential or system profiling is sent by the updater.
+Sparkle stores update preferences and last-check state locally. TestFlight builds
+contain no Sparkle framework and keep Apple's update mechanism. Debug builds do
+not start the production updater.
+
 ## Local data and support
 
 Appearance/sound settings persist locally. Imported sound files are copied into

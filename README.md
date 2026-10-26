@@ -25,6 +25,12 @@ brew install --cask nomdelasociete/tap/git-island
 Update with `brew update && brew upgrade --cask nomdelasociete/tap/git-island`.
 Homebrew does not install updates in the background by default.
 
+The next direct-distribution release adds automatic updates through Sparkle.
+Existing 0.15 and older installations need one manual upgrade to that release;
+they cannot acquire the updater automatically. In builds that include it, General
+settings controls automatic checks/downloads and the menu offers **Check for
+Updates…**. TestFlight continues to manage its own updates.
+
 ## Build from source
 
 Install Xcode 26 or later (Swift 6.2+) and

@@ -97,6 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        AppUpdateService.shared.start()
         configureAuthenticatedExperience()
         let store = GitIslandStore.shared
         // Recovery may appear automatically until dismissed. After that,

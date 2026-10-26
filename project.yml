@@ -15,8 +15,13 @@ settings:
     ENABLE_USER_SCRIPT_SANDBOXING: NO
     ENABLE_HARDENED_RUNTIME: YES
 
-targets:
-  GitIsland:
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.10.1
+
+targetTemplates:
+  GitIslandApp:
     type: application
     platform: macOS
     deploymentTarget: "26.0"
@@ -76,6 +81,34 @@ targets:
             exit 1
           fi
 
+targets:
+  GitIsland:
+    templates: [GitIslandApp]
+  GitIslandDirect:
+    templates: [GitIslandApp]
+    info:
+      path: GitIslandDirect-Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        SUFeedURL: https://gitis.land/appcast.xml
+        SUPublicEDKey: KSSnb4UT84hhhYlq55Icrcn4oMUGbyObjmfDVCZhyJ4=
+        SUEnableInstallerLauncherService: true
+        SUEnableAutomaticChecks: true
+        SUAutomaticallyUpdate: true
+        SUVerifyUpdateBeforeExtraction: true
+        SUEnableSystemProfiling: false
+        SUScheduledCheckInterval: 14400
+        SUScheduledImpatientCheckInterval: 86400
+    dependencies:
+      - package: Sparkle
+    settings:
+      base:
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DIRECT_DISTRIBUTION"
+      configs:
+        Release:
+          CODE_SIGN_ENTITLEMENTS: GitIslandDirect.entitlements
+
 schemes:
   GitIsland:
     build:
@@ -87,6 +120,17 @@ schemes:
       config: Debug
     profile:
       config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
+  GitIslandDirect:
+    build:
+      targets:
+        GitIslandDirect: all
+    run:
+      config: Debug
     analyze:
       config: Debug
     archive:
