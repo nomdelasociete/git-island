@@ -339,3 +339,21 @@ absence of Sparkle/configuration from the Apple build. The website build include
 the appcast. A signed synthetic file verifies successfully and a modified copy
 fails verification; feed checks reject insecure URLs, missing signatures and
 archive-length mismatches. These checks do not replace installation acceptance.
+
+## Version 0.16 release preparation
+
+Version 0.16 (202610260003) is archived separately for TestFlight and Developer ID
+from the merged updater implementation. Both signed exports succeeded. TestFlight
+build `cba752f5-b62e-4910-bc9f-c31f80572a71` is VALID and IN_BETA_TESTING for the
+existing internal testers group; its en-US What to Test notes were read back and
+verified. No new TestFlight installation/runtime launch is claimed.
+
+The Developer ID app and DMG are notarized and stapled; Gatekeeper accepts both.
+The prepared DMG SHA-256 is
+`a900a674ab5d183a806ffea4ab312d7062862dc494b9656bdc93d629cfeb70ba`.
+An isolated, signed/notarized test identity verified actual version/build display,
+default automatic-update settings, a successful no-update check and a clear error
+when the local update server is unavailable. The production installation was not
+modified. Old-to-new installation and preservation acceptance remain pending the
+local signing tool's Keychain access; the DMG is not yet published and no update
+entry is advertised in the production feed.
