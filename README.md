@@ -12,7 +12,7 @@ other displays do not show it. The menu-bar controls remain available.
 
 ## Install
 
-Download the signed, Apple-notarized [Git Island 0.14 installer](https://github.com/nomdelasociete/git-island/releases/download/v0.14/Git-Island-0.14.dmg),
+Download the signed, Apple-notarized [Git Island 0.15 installer](https://github.com/nomdelasociete/git-island/releases/download/v0.15/Git-Island-0.15.dmg),
 open it and drag Git Island to Applications. Updates are manual: download the
 new installer from [Releases](https://github.com/nomdelasociete/git-island/releases).
 

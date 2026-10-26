@@ -46,10 +46,10 @@ targets:
         INFOPLIST_KEY_NSPrincipalClass: NSApplication
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
-        CURRENT_PROJECT_VERSION: "202610260001"
+        CURRENT_PROJECT_VERSION: "202610260002"
         DEVELOPMENT_TEAM: JSFMAD28GS
         ENABLE_APP_SANDBOX: YES
-        MARKETING_VERSION: "0.14"
+        MARKETING_VERSION: "0.15"
         CODE_SIGN_STYLE: Automatic
       configs:
         Debug:
