@@ -277,8 +277,19 @@ per-user coalescing, targeted webhook invalidations, reconciliation for uncovere
 repositories, and persistent provider backoff. Native GraphQL rate-limit errors
 no longer trigger REST fallback.
 
-This is prepared code, not a production rollout. The coordinated Relay change,
-separate OAuth App registration/configuration, real account/organization coverage,
-revocation and latency validation, and updated hosted-service disclosures must
-be verified before enabling it for users. No app launch or distribution is part
-of this work.
+Relay PR #25 (`c8aa67a`) was deployed to all five production Workers on
+26 October 2026, preserving existing keys and domains. The separate Git Island
+Inbox Sync OAuth App is configured. Public health and authentication checks pass.
+A real browser authorization and temporary device session verified matching
+numeric identity, snapshot delivery, four concurrent reads sharing one cached
+revision, the inbox SSE handshake, and explicit refresh. Cleanup deleted the
+server inbox grant/cache and revoked the temporary device; subsequent requests
+returned 428 and 401 respectively. Deleting the server grant does not revoke the
+OAuth authorization at GitHub.
+
+The native client remains in PR #15 and is not distributed. Its 120 ordinary
+Swift tests and compile-only macOS build pass on the updated branch. Full native
+UI acceptance, webhook-to-display latency, multiple real Macs/accounts, SSO and
+naturally elapsed OAuth renewal remain unverified. The concurrent-read check
+establishes shared snapshot responses, not a measured GitHub API call count.
+No app launch or distribution is part of this work.
