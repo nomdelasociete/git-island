@@ -287,12 +287,13 @@ server inbox grant/cache and revoked the temporary device; subsequent requests
 returned 428 and 401 respectively. Deleting the server grant does not revoke the
 OAuth authorization at GitHub.
 
-The native client remains in PR #15 and is not distributed. Its 120 ordinary
-Swift tests and compile-only macOS build pass on the updated branch. Full native
-UI acceptance, webhook-to-display latency, multiple real Macs/accounts, SSO and
-naturally elapsed OAuth renewal remain unverified. The concurrent-read check
+Before the 0.15 release recorded below, the native client was still in PR #15
+and had not been distributed. At that stage, its 120 ordinary Swift tests and
+compile-only macOS build passed. Full native UI acceptance, webhook-to-display
+latency, multiple real Macs/accounts, SSO and naturally elapsed OAuth renewal
+were still unverified. The concurrent-read check
 establishes shared snapshot responses, not a measured GitHub API call count.
-No app launch or distribution is part of this work.
+That preparation phase did not include an app launch or distribution.
 
 
 ### Version 0.15 distribution
@@ -311,5 +312,6 @@ and matches SHA-256 `c4a34cb0ac1a644f75ae7de823ddd80bd7616ec108a2b5f53ebc3572809
 TestFlight build `ead9379a-3ace-4e01-af21-d09983275245` is VALID and IN_BETA_TESTING
 for the existing internal testers group; build-specific en-US What to Test notes
 were read back and verified. This verifies distribution availability, not a new
-TestFlight installation or runtime launch. Website and Homebrew updates remain
-subject to their PR review and merge workflows.
+TestFlight installation or runtime launch. Homebrew tap PR #2 was merged on
+26 October 2026. The website update remains in PR #17, pending review and merge
+before CI deployment.
