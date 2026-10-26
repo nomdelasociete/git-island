@@ -1,0 +1,7 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Public Ed25519 verification key embedded in the app, never the signing secret"
+regexTarget = "secret"
+regexes = ['''^KSSnb4UT84hhhYlq55Icrcn4oMUGbyObjmfDVCZhyJ4=$''']
