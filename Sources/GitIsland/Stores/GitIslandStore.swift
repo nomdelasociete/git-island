@@ -505,7 +505,6 @@ final class GitIslandStore: ObservableObject {
         outlineLaneStyle.room(laneCount: outlineSegments.map(\.lanes).max() ?? 0)
     }
 
-    static let buildStamp = "2026-06-28a"
 
     var currentIslandSize: CGSize {
         panelFrameSize

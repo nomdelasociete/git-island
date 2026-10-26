@@ -85,6 +85,8 @@ struct GitIslandMenuView: View {
         Divider()
 #endif
 
+        CheckForAppUpdatesButton()
+
         Button("Quit Git Island") {
             NSApplication.shared.terminate(nil)
         }

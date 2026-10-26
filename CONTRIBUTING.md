@@ -72,6 +72,44 @@ Before publication, reconcile the intended revision with the current production
 revision and pending deployments to avoid replacing newer or unmerged work.
 Verify the deployed assets or distributed artifact before announcing availability.
 
+## Preparing direct-distribution updates
+
+Use the **GitIslandDirect** scheme for Developer ID archives/DMGs. Use the
+existing **GitIsland** scheme for TestFlight; it deliberately does not link
+Sparkle or include its sandbox exceptions. Archive each scheme separately, even
+when version and build numbers match. Keep `CFBundleVersion` increasing; Settings
+reads both version fields from the built Info.plist.
+
+The direct Release configuration enables Sparkle's installer service, automatic
+checks/downloads and archive signature verification. Its public key is committed
+in project.yml. The matching private key lives only in the release operator's
+login Keychain under Sparkle account `com.nomdelasociete.GitIsland`. Preserve a
+secure backup through the normal signing-key process; never commit or log it.
+Use the pinned Sparkle 2.10.1 tools from the resolved package artifacts.
+
+After exporting, notarizing and stapling the Developer ID app and DMG, prepare
+the feed locally:
+
+```sh
+SPARKLE_BIN=/path/to/Sparkle/bin ./script/prepare_appcast.sh /path/to/Git-Island-VERSION.dmg VERSION
+```
+
+The helper validates the artifact and signature, generates a candidate feed in
+`build/appcast-VERSION/`, and publishes nothing. Inspect the generated version,
+minimum OS, signature and download URL. After explicit release/channel approval,
+publish the exact DMG to the GitHub release and verify its downloaded checksum.
+Copy the candidate appcast to `website/public/appcast.xml` in a PR only after
+that asset is available. Merge/deploy the feed through the existing website CI
+policy. Never advertise an unpublished artifact or reuse a published build number.
+The initial empty feed is intentional until the first authorized Sparkle release.
+
+Before shipping the updater, test a real signed/notarized old-to-new installation
+on a Mac, including automatic download, restart, preserved credentials/settings,
+no-update/offline behavior and rejected tampered archives. An unsigned build or
+unit-test run does not establish end-to-end update acceptance. For Homebrew's
+first updater-enabled release, set the cask's `auto_updates true` in its version
+PR so Homebrew knows the app manages its own updates.
+
 ## Privacy and security
 
 Use invented people, repositories, titles, addresses, and keys in fixtures and

@@ -41,7 +41,7 @@ jobs:
           swift --version
           xcodegen --version
           xcodegen generate --spec project.yml
-          git diff --exit-code -- GitIsland.xcodeproj
+          git diff --exit-code -- GitIsland.xcodeproj GitIslandDirect-Info.plist
       - name: Unit tests without live service credentials
         run: env -u GITHUB_TOKEN -u GH_TOKEN -u RELAY_LIVE_VALIDATION_DIR -u RELAY_LIVE_GITHUB_TOKEN swift test --skip RelayLiveAcceptanceTests
       - name: Unsigned Debug build
@@ -50,6 +50,18 @@ jobs:
           -configuration Debug -destination 'platform=macOS'
           -derivedDataPath "$RUNNER_TEMP/GitIslandDerivedData"
           build CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM=
+      - name: Build both release channels and verify updater isolation
+        run: |
+          xcodebuild -project GitIsland.xcodeproj -scheme GitIslandDirect \
+            -configuration Release -destination 'platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/GitIslandDirect" \
+            build CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM=
+          python3 script/verify_update_bundle.py "$RUNNER_TEMP/GitIslandDirect/Build/Products/Release/Git Island.app" direct
+          xcodebuild -project GitIsland.xcodeproj -scheme GitIsland \
+            -configuration Release -destination 'platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/GitIslandDerivedData" \
+            build CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM=
+          python3 script/verify_update_bundle.py "$RUNNER_TEMP/GitIslandDerivedData/Build/Products/Release/Git Island.app" apple
       - name: Verify packaged license notices
         run: |
           resources="$RUNNER_TEMP/GitIslandDerivedData/Build/Products/Debug/Git Island Dev.app/Contents/Resources"
@@ -73,6 +85,8 @@ jobs:
       - name: Install locked website dependencies
         working-directory: website
         run: npm ci
+      - name: Validate update feed
+        run: python3 script/validate_appcast.py website/public/appcast.xml
       - name: Build website
         working-directory: website
         run: npm run build
