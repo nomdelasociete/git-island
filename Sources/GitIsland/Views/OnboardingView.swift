@@ -259,22 +259,7 @@ struct OnboardingView: View {
 
     private var appearanceStep: some View {
         Form {
-            Section {
-                LabeledContent("Outline width") {
-                    Slider(value: laneSelection(\.width), in: OutlineLaneStyle.widthRange)
-                }
-                LabeledContent("Line spacing") {
-                    Slider(value: laneSelection(\.gap), in: OutlineLaneStyle.gapRange)
-                }
-                Toggle(
-                    "Crazy animations",
-                    isOn: Binding(
-                        get: { store.crazyAnimationsEnabled }, set: { store.updateCrazyAnimationsEnabled($0) }))
-            } footer: {
-                Text(
-                    "These settings apply to your actual island at the top of the screen. With no open PRs, it stays hidden. Motion follows your Mac’s Reduce Motion setting."
-                )
-            }
+            IslandAppearanceSections(store: store)
             Section {
                 Picker(
                     "New PR sound",
@@ -294,18 +279,6 @@ struct OnboardingView: View {
             LaunchAtLoginSection()
         }.formStyle(.grouped)
             .scrollContentBackground(.hidden)
-    }
-
-    private func laneSelection(_ keyPath: WritableKeyPath<OutlineLaneStyle, CGFloat>) -> Binding<
-        CGFloat
-    > {
-        Binding(
-            get: { store.outlineLaneStyle[keyPath: keyPath] },
-            set: { value in
-                var style = store.outlineLaneStyle
-                style[keyPath: keyPath] = value
-                store.updateOutlineLaneStyle(style)
-            })
     }
 
     private var signInInstruction: String {

@@ -260,7 +260,19 @@ private struct AccountAvatar: View {
 
 private struct AppearanceSettingsPane: View {
     @ObservedObject var store: GitIslandStore
-    @State private var previewSample: OutlinePreviewSample = .busy
+
+    var body: some View {
+        Form {
+            IslandAppearanceSections(store: store)
+        }
+        .formStyle(.grouped)
+    }
+}
+
+/// Used by both first-run setup and Settings so every style and control stays available.
+struct IslandAppearanceSections: View {
+    @ObservedObject var store: GitIslandStore
+    @State private var previewSample: OutlinePreviewSample = .each
 
     private var crazyAnimationsSelection: Binding<Bool> {
         Binding(
@@ -288,14 +300,31 @@ private struct AppearanceSettingsPane: View {
             [.ready: 3, .blocked: 1, .waiting: 2, .testing: 7]
         case .calm:
             [.ready: 1, .waiting: 1]
+        case .each:
+            [.ready: 1, .blocked: 1, .waiting: 1, .testing: 1]
+        case .oneBlocked:
+            [.blocked: 1]
+        case .manyBlocked:
+            [.blocked: 5]
+        case .manyReady:
+            [.ready: 5]
+        case .manyTesting:
+            [.testing: 5]
+        case .dominant:
+            [.ready: 1, .blocked: 6, .waiting: 1, .testing: 1]
+        case .balanced:
+            [.ready: 3, .blocked: 3, .waiting: 3, .testing: 3]
+        case .empty:
+            [:]
         }
     }
 
     var body: some View {
-        Form {
+        Group {
             Section {
                 VStack(spacing: 12) {
                     OutlinePreview(counts: previewCounts, style: store.outlineLaneStyle)
+                        .frame(maxWidth: 320)
                         .frame(maxWidth: .infinity)
 
                     Picker("Preview", selection: $previewSample) {
@@ -303,47 +332,80 @@ private struct AppearanceSettingsPane: View {
                             Text(sample.label).tag(sample)
                         }
                     }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
+                    .pickerStyle(.menu)
                     .frame(maxWidth: 320)
+
+                    HStack(spacing: 12) {
+                        ForEach(IslandDesignSystem.outlineOrder) { group in
+                            Text("\(previewCounts[group, default: 0]) \(group.rawValue)")
+                                .foregroundStyle(group.tint)
+                        }
+                    }
+                    .font(.caption)
                 }
                 .padding(.vertical, 6)
             }
 
             Section {
-                LabeledContent("Line width") {
-                    SliderValue(
-                        value: laneSelection(\.width),
-                        range: OutlineLaneStyle.widthRange,
-                        label: points(store.outlineLaneStyle.width)
-                    )
+                Picker("Style", selection: laneSelection(\.appearance)) {
+                    ForEach(IslandOutlineAppearance.allCases) { appearance in
+                        Text(appearance.label).tag(appearance)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                if store.outlineLaneStyle.appearance == .halo {
+                    LabeledContent("Halo strength") {
+                        SliderValue(
+                            value: laneSelection(\.haloStrength), range: 0...1,
+                            label: percent(store.outlineLaneStyle.haloStrength), step: 0.01
+                        )
+                    }
+                    LabeledContent("Transparency") {
+                        SliderValue(
+                            value: laneSelection(\.haloTransparency), range: 0...1,
+                            label: percent(store.outlineLaneStyle.haloTransparency), step: 0.01
+                        )
+                    }
                 }
 
-                LabeledContent("Spacing") {
-                    SliderValue(
-                        value: laneSelection(\.gap),
-                        range: OutlineLaneStyle.gapRange,
-                        label: store.outlineLaneStyle.gap == 0 ? "None" : points(store.outlineLaneStyle.gap)
-                    )
-                }
+                if store.outlineLaneStyle.appearance == .lines {
+                    LabeledContent("Line width") {
+                        SliderValue(
+                            value: laneSelection(\.width),
+                            range: OutlineLaneStyle.widthRange,
+                            label: points(store.outlineLaneStyle.width)
+                        )
+                    }
 
-                LabeledContent("Maximum lines") {
-                    Stepper(value: laneSelection(\.maxLanes), in: OutlineLaneStyle.maxLanesRange) {
-                        Text("\(store.outlineLaneStyle.maxLanes)")
-                            .monospacedDigit()
+                    LabeledContent("Spacing") {
+                        SliderValue(
+                            value: laneSelection(\.gap),
+                            range: OutlineLaneStyle.gapRange,
+                            label: store.outlineLaneStyle.gap == 0 ? "None" : points(store.outlineLaneStyle.gap)
+                        )
+                    }
+
+                    LabeledContent("Maximum lines") {
+                        Stepper(value: laneSelection(\.maxLanes), in: OutlineLaneStyle.maxLanesRange) {
+                            Text("\(store.outlineLaneStyle.maxLanes)")
+                                .monospacedDigit()
+                        }
                     }
                 }
             } header: {
                 Text("Outline")
             } footer: {
                 HStack(alignment: .firstTextBaseline) {
-                    Text("Each pull request draws one line in its status color. Past the maximum, the lines merge into one thick line.")
+                    Text(store.outlineLaneStyle.appearance == .lines
+                         ? "Each pull request draws one line in its status color. Past the maximum, the lines merge into one thick line."
+                         : "Colors show the share of each status, not the total number of pull requests. Hover the notch to see counts.")
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button("Reset to Defaults") {
-                        store.updateOutlineLaneStyle(.standard)
+                        store.updateOutlineLaneStyle(resetStyle)
                     }
-                    .disabled(store.outlineLaneStyle == .standard)
+                    .disabled(store.outlineLaneStyle == resetStyle)
                 }
             }
 
@@ -360,11 +422,20 @@ private struct AppearanceSettingsPane: View {
                 Text("Animations")
             }
         }
-        .formStyle(.grouped)
+    }
+
+    private var resetStyle: OutlineLaneStyle {
+        var style = OutlineLaneStyle.standard
+        style.appearance = store.outlineLaneStyle.appearance
+        return style
     }
 
     private func points(_ value: CGFloat) -> String {
         "\(Double(value).formatted(.number.precision(.fractionLength(0...2)))) pt"
+    }
+
+    private func percent(_ value: CGFloat) -> String {
+        "\(Int((value * 100).rounded()))%"
     }
 }
 
@@ -372,6 +443,7 @@ private enum OutlinePreviewSample: String, CaseIterable, Identifiable {
     case inbox
     case busy
     case calm
+    case each, oneBlocked, manyBlocked, manyReady, manyTesting, dominant, balanced, empty
 
     var id: String { rawValue }
 
@@ -380,6 +452,14 @@ private enum OutlinePreviewSample: String, CaseIterable, Identifiable {
         case .inbox: "My inbox"
         case .busy: "Busy"
         case .calm: "Calm"
+        case .each: "One of each status"
+        case .oneBlocked: "One blocked"
+        case .manyBlocked: "Five blocked"
+        case .manyReady: "Five ready"
+        case .manyTesting: "Five testing"
+        case .dominant: "Mostly blocked"
+        case .balanced: "Three of each status"
+        case .empty: "No pull requests"
         }
     }
 }
@@ -388,10 +468,11 @@ private struct SliderValue: View {
     @Binding var value: CGFloat
     let range: ClosedRange<CGFloat>
     let label: String
+    var step: CGFloat = 0.25
 
     var body: some View {
         HStack(spacing: 10) {
-            Slider(value: $value, in: range, step: 0.25)
+            Slider(value: $value, in: range, step: step)
                 .frame(width: 180)
             Text(label)
                 .monospacedDigit()
@@ -407,7 +488,7 @@ private struct OutlinePreview: View {
     let counts: [PullRequestGroup: Int]
     let style: OutlineLaneStyle
 
-    private let canvas = CGSize(width: 300, height: 64)
+    private let canvas = CGSize(width: 300, height: 112)
     private let notchWidth: CGFloat = 170
     private let bandHeight: CGFloat = 30
 

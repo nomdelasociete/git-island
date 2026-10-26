@@ -153,7 +153,7 @@ final class IslandPanelController {
             }
             .store(in: &cancellables)
 
-        // Lane width, spacing and limit change the room reserved below the surface.
+        // Outline settings change only the decorative room below the surface.
         store.$outlineLaneStyle
             .removeDuplicates()
             .sink { [weak self] _ in
