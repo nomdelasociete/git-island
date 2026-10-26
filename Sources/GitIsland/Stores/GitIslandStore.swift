@@ -56,6 +56,9 @@ final class GitIslandStore: ObservableObject {
     }
     @Published private(set) var relayInboxEnabled = UserPreferences.relayInboxEnabled
     @Published private(set) var relayInboxSetupBusy = false
+    private var relayInboxAuthorizationTask: Task<Void, Never>?
+    private var relayInboxAuthorizationID: UUID?
+    var relayInboxAuthorizationPending: Bool { relayInboxAuthorizationID != nil }
     let relayDevice = RelayDeviceSession()
     private var relayDeviceObservation: AnyCancellable?
     var currentRelayConfiguration: RelayConfiguration? {
@@ -720,6 +723,7 @@ final class GitIslandStore: ObservableObject {
     }
 
     func signOut() {
+        cancelRelayInboxAuthorization()
         accountGeneration = UUID()
         service = GitHubPullRequestService()
         stopAutoRefresh()
@@ -942,38 +946,75 @@ final class GitIslandStore: ObservableObject {
         if autoRefreshEnabled { restartAutoRefresh() }
     }
 
+    func cancelRelayInboxAuthorization() {
+        guard relayInboxAuthorizationID != nil else { return }
+        relayInboxAuthorizationTask?.cancel()
+        relayInboxAuthorizationTask = nil
+        relayInboxAuthorizationID = nil
+        relayInboxSetupBusy = false
+    }
+
     func authorizeRelayInbox() {
-        guard let configuration = currentRelayConfiguration, !relayInboxSetupBusy else { return }
+        guard let configuration = currentRelayConfiguration, let login = githubLogin,
+              let subject = relayDevice.inboxSubject, !relayInboxSetupBusy else { return }
+        let generation = accountGeneration
+        let requestID = UUID()
+        relayInboxAuthorizationID = requestID
         relayInboxSetupBusy = true
-        Task {
-            defer { relayInboxSetupBusy = false }
+        relayInboxAuthorizationTask = Task {
+            defer {
+                if relayInboxAuthorizationID == requestID {
+                    relayInboxAuthorizationTask = nil
+                    relayInboxAuthorizationID = nil
+                    relayInboxSetupBusy = false
+                }
+            }
             do {
-                let url = try await RelayInboxClient(configuration: configuration).authorizationURL()
-                guard currentRelayConfiguration == configuration else { return }
+                let client = RelayInboxClient(configuration: configuration)
+                let url = try await client.authorizationURL()
+                try Task.checkCancellation()
+                guard accountGeneration == generation, currentRelayConfiguration == configuration else { return }
                 guard NSWorkspace.shared.open(url) else { throw RelayInboxError.invalidResponse }
+                try await client.waitForAuthorization(login: login, subject: subject)
+                try Task.checkCancellation()
+                guard accountGeneration == generation, currentRelayConfiguration == configuration,
+                      relayInboxAuthorizationID == requestID else { return }
                 relayInboxEnabled = true
                 UserPreferences.relayInboxEnabled = true
                 nextAllowedRefreshDate = nil
                 restartAutoRefresh()
                 refresh(force: true)
-            } catch { lastError = error.localizedDescription }
+            } catch {
+                if !Task.isCancelled, accountGeneration == generation,
+                   relayInboxAuthorizationID == requestID { lastError = error.localizedDescription }
+            }
         }
+    }
+
+    func disableRelayInbox() {
+        cancelRelayInboxAuthorization()
+        relayInboxEnabled = false
+        UserPreferences.relayInboxEnabled = false
+        nextAllowedRefreshDate = nil
+        restartAutoRefresh()
+        refresh(force: true)
     }
 
     func revokeRelayInbox() {
         guard let configuration = currentRelayConfiguration, !relayInboxSetupBusy else { return }
+        let generation = accountGeneration
         relayInboxSetupBusy = true
         Task {
             defer { relayInboxSetupBusy = false }
             do {
                 try await RelayInboxClient(configuration: configuration).revoke()
-                guard currentRelayConfiguration == configuration else { return }
-                relayInboxEnabled = false
-                UserPreferences.relayInboxEnabled = false
-                nextAllowedRefreshDate = nil
-                restartAutoRefresh()
-                refresh(force: true)
-            } catch { lastError = error.localizedDescription }
+                guard accountGeneration == generation, currentRelayConfiguration == configuration else { return }
+                disableRelayInbox()
+            } catch {
+                if accountGeneration == generation {
+                    lastError = "Server inbox deletion was not confirmed. You can still disable sync on this Mac. " + error.localizedDescription
+                }
+            }
         }
     }
 

@@ -910,7 +910,9 @@ private struct RefreshSettingsPane: View {
 
             if store.isAuthenticated && !store.relayConnected {
                 Section {
-                    if store.hasRelayConfiguration {
+                    if store.relayInboxEnabled {
+                        LabeledContent("Check Relay", value: "Every 30 seconds")
+                    } else if store.hasRelayConfiguration {
                         if !store.githubRefreshPaused {
                             LabeledContent("Check GitHub", value: "Every minute until reconnected")
                         }
@@ -936,9 +938,15 @@ private struct RefreshSettingsPane: View {
                     .disabled(store.currentRelayConfiguration == nil || store.relayInboxSetupBusy)
                 if store.relayInboxEnabled {
                     Text("Server sync enabled. GitHub reads will not resume locally if Relay is unavailable.")
-                    Button("Revoke server inbox and resume local checks", role: .destructive) { store.revokeRelayInbox() }
-                        .disabled(store.currentRelayConfiguration == nil || store.relayInboxSetupBusy)
+                    Button("Disable sync on this Mac and resume local checks") { store.disableRelayInbox() }
                 }
+                if store.relayInboxAuthorizationPending {
+                    Button("Cancel pending authorization") { store.cancelRelayInboxAuthorization() }
+                }
+                Button("Delete server inbox for all my Macs", role: .destructive) { store.revokeRelayInbox() }
+                    .disabled(store.currentRelayConfiguration == nil || store.relayInboxSetupBusy)
+                Text("Disabling sync on this Mac keeps the server authorization and cache. Delete the server inbox separately to remove them for all your Macs.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
             RelaySettingsSection(store: store)
         }

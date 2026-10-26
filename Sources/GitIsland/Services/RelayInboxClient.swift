@@ -7,6 +7,20 @@ struct RelayInboxSnapshot: Decodable {
     let updatedAt: TimeInterval
     let revision: String
     let data: GitHubInboxGraphQLData
+
+    private enum CodingKeys: String, CodingKey { case schema, subject, login, updatedAt, revision, data }
+    private enum DataKeys: String, CodingKey { case s0 }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        schema = try values.decode(Int.self, forKey: .schema)
+        subject = try values.decode(String.self, forKey: .subject)
+        login = try values.decode(String.self, forKey: .login)
+        updatedAt = try values.decode(TimeInterval.self, forKey: .updatedAt)
+        revision = try values.decode(String.self, forKey: .revision)
+        let results = try values.nestedContainer(keyedBy: DataKeys.self, forKey: .data)
+        data = GitHubInboxGraphQLData(searches: [try results.decode(GitHubGraphQLSearch.self, forKey: .s0)])
+    }
 }
 
 enum RelayInboxError: LocalizedError {
@@ -73,6 +87,20 @@ struct RelayInboxClient {
               snapshot.updatedAt >= Date().timeIntervalSince1970 - 300,
               snapshot.data.isComplete else { throw RelayInboxError.invalidResponse }
         return snapshot
+    }
+
+    func waitForAuthorization(login: String, subject: String, attempts: Int = 120,
+                              pause: () async throws -> Void = { try await Task.sleep(for: .seconds(5)) }) async throws {
+        for _ in 0..<attempts {
+            try Task.checkCancellation()
+            do {
+                _ = try await fetch(login: login, subject: subject)
+                return
+            } catch RelayInboxError.authorizationRequired {
+                try await pause()
+            }
+        }
+        throw URLError(.timedOut)
     }
 
     func authorizationURL() async throws -> URL {
