@@ -244,3 +244,24 @@ verified SHA-256. Future releases must bump its version and checksum in the tap.
 The cask passes Homebrew style and online audit, and installs successfully into
 an isolated application directory. The installed app passes Gatekeeper; it was
 not launched, and the temporary installation was removed after verification.
+
+### Version 0.14 distribution
+
+Halo and Minimal are additional notch styles; Lines remains the default and
+preserves existing lane preferences. Settings and onboarding share appearance
+controls, including continuous Halo strength and transparency sliders and inbox
+preview scenarios.
+
+All 116 ordinary SwiftPM tests, Debug build, Release archive, both signed exports,
+and website production build pass. Native onboarding welcome, permissions, sign-in
+entry, appearance choices, slider extremes, and completion were checked on the
+notched Mac. The OAuth authorization flow was not repeated. Exhaustive hover
+transitions with unequal group sizes remain unverified. The direct app and DMG
+are notarized, stapled, and accepted by Gatekeeper.
+
+TestFlight 0.14 (202610260001) is valid and in internal beta testing, with
+build-specific What to Test notes read back and verified. The signed DMG is
+published at the v0.14 GitHub release; its downloaded SHA-256 matches the release
+artifact and Gatekeeper accepts it. Website and Homebrew updates remain in their
+reviewed PR workflows. App Store export uses the existing Frontline API profile,
+as for 0.13; RonssinCI lacks the required cloud-signing permissions.
