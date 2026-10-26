@@ -117,7 +117,14 @@ final class GitIslandStore: ObservableObject {
     private var presentedWidthProgress: CGFloat?
     private var pendingExpansionTask: Task<Void, Never>?
     private var lastRefreshAttemptDate: Date?
-    private var nextAllowedRefreshDate: Date?
+    private var inboxBackoff = InboxRefreshBackoff()
+    private var nextAllowedRefreshDate: Date? {
+        get { inboxBackoff.readDeadline(serverInbox: relayInboxEnabled) }
+        set {
+            if relayInboxEnabled { inboxBackoff.relayUntil = newValue }
+            else { inboxBackoff.githubUntil = newValue }
+        }
+    }
     private var highFrequencyRefreshUntil: Date?
     private var locallyHiddenPullRequestIDs = Set<Int>()
     private var locallyHiddenPullRequestClearTasks = [Int: Task<Void, Never>]()
@@ -724,6 +731,9 @@ final class GitIslandStore: ObservableObject {
 
     func signOut() {
         cancelRelayInboxAuthorization()
+        relayInboxEnabled = false
+        UserPreferences.relayInboxEnabled = false
+        inboxBackoff = InboxRefreshBackoff()
         accountGeneration = UUID()
         service = GitHubPullRequestService()
         stopAutoRefresh()
@@ -981,7 +991,6 @@ final class GitIslandStore: ObservableObject {
                       relayInboxAuthorizationID == requestID else { return }
                 relayInboxEnabled = true
                 UserPreferences.relayInboxEnabled = true
-                nextAllowedRefreshDate = nil
                 restartAutoRefresh()
                 refresh(force: true)
             } catch {
@@ -995,7 +1004,6 @@ final class GitIslandStore: ObservableObject {
         cancelRelayInboxAuthorization()
         relayInboxEnabled = false
         UserPreferences.relayInboxEnabled = false
-        nextAllowedRefreshDate = nil
         restartAutoRefresh()
         refresh(force: true)
     }
@@ -1282,7 +1290,7 @@ final class GitIslandStore: ObservableObject {
                 if inboxEnabled {
                     guard let inboxConfiguration, let currentLogin, let inboxSubject else { throw RelayInboxError.deviceNotReady }
                     let snapshot = try await RelayInboxClient(configuration: inboxConfiguration).fetch(login: currentLogin, subject: inboxSubject, refresh: reason == .merge || reason == .updateBranch || reason == .manual)
-                    let inbox = service.inboxPullRequests(from: snapshot.data, currentLogin: snapshot.login)
+                    let inbox = service.inboxPullRequests(from: snapshot.data, currentLogin: currentLogin)
                     if let repositoryFullNames {
                         let names = Set(repositoryFullNames.map { $0.lowercased() })
                         pullRequests = inbox.filter { names.contains($0.repositoryFullName.lowercased()) }
@@ -1407,6 +1415,11 @@ final class GitIslandStore: ObservableObject {
     }
 
     func merge(_ pullRequest: PullRequest) {
+        if let deadline = inboxBackoff.githubUntil, Date() < deadline {
+            lastError = "GitHub actions are paused until \(Self.timeFormatter.string(from: deadline))."
+            return
+        }
+
         guard pullRequest.defaultMergeMethod != nil else {
             lastError = GitHubServiceError.mergeUnavailable.errorDescription
             return
@@ -1446,7 +1459,7 @@ final class GitIslandStore: ObservableObject {
                        gitHubError.isRateLimited {
                         let minimumRetryDate = Date().addingTimeInterval(Self.minimumRefreshSpacing)
                         let retryDate = gitHubError.retryAfterDate ?? Date().addingTimeInterval(Self.rateLimitFallbackBackoff)
-                        self.nextAllowedRefreshDate = max(retryDate, minimumRetryDate)
+                        self.inboxBackoff.githubUntil = max(retryDate, minimumRetryDate)
                     }
                     if case .api(statusCode: 401, message: _, retryAfterDate: _) = error as? GitHubServiceError {
                         self.signOut()
@@ -1473,6 +1486,11 @@ final class GitIslandStore: ObservableObject {
     }
 
     func updateBranch(_ pullRequest: PullRequest) {
+        if let deadline = inboxBackoff.githubUntil, Date() < deadline {
+            lastError = "GitHub actions are paused until \(Self.timeFormatter.string(from: deadline))."
+            return
+        }
+
         guard pullRequest.canUpdateBranch else {
             lastError = GitHubServiceError.branchUpdateUnavailable.errorDescription
             return
@@ -1506,7 +1524,7 @@ final class GitIslandStore: ObservableObject {
                        gitHubError.isRateLimited {
                         let minimumRetryDate = Date().addingTimeInterval(Self.minimumRefreshSpacing)
                         let retryDate = gitHubError.retryAfterDate ?? Date().addingTimeInterval(Self.rateLimitFallbackBackoff)
-                        self.nextAllowedRefreshDate = max(retryDate, minimumRetryDate)
+                        self.inboxBackoff.githubUntil = max(retryDate, minimumRetryDate)
                     }
                     if case .api(statusCode: 401, message: _, retryAfterDate: _) = error as? GitHubServiceError {
                         self.signOut()
@@ -2092,4 +2110,14 @@ private struct PullRequestSignature: Hashable {
     let headSHA: String
     let reason: String
     let statusLabel: String
+}
+
+/// GitHub writes and local reads share GitHub's budget; Relay reads have their own.
+struct InboxRefreshBackoff {
+    var githubUntil: Date?
+    var relayUntil: Date?
+
+    func readDeadline(serverInbox: Bool) -> Date? {
+        serverInbox ? relayUntil : githubUntil
+    }
 }

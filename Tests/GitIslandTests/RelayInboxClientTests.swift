@@ -50,6 +50,20 @@ final class RelayInboxClientTests: XCTestCase {
         do { _ = try await client.fetch(login: "example-user", subject: "10", refresh: true); XCTFail("Should request consent") }
         catch RelayInboxError.authorizationRequired { }
     }
+    func testNativeWriteBackoffDoesNotBlockRelayReads() {
+        let deadline = Date().addingTimeInterval(900)
+        var backoff = InboxRefreshBackoff(githubUntil: deadline)
+        XCTAssertNil(backoff.readDeadline(serverInbox: true))
+        XCTAssertEqual(backoff.readDeadline(serverInbox: false), deadline)
+        let relayDeadline = Date().addingTimeInterval(60)
+        backoff.relayUntil = relayDeadline
+        XCTAssertEqual(backoff.readDeadline(serverInbox: true), relayDeadline)
+        XCTAssertEqual(backoff.githubUntil, deadline)
+        backoff.relayUntil = nil
+        XCTAssertNil(backoff.readDeadline(serverInbox: true))
+        XCTAssertEqual(backoff.readDeadline(serverInbox: false), deadline)
+    }
+
     func testMissingSearchCannotEraseInbox() async throws {
         for data in ["{}", "{\"s1\":{\"issueCount\":0,\"nodes\":[]}}", "{\"s0\":null}"] {
             let client = RelayInboxClient(configuration: configuration, send: { _ in
