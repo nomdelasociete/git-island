@@ -244,3 +244,17 @@ verified SHA-256. Future releases must bump its version and checksum in the tap.
 The cask passes Homebrew style and online audit, and installs successfully into
 an isolated application directory. The installed app passes Gatekeeper; it was
 not launched, and the temporary installation was removed after verification.
+
+### Version 0.14 preparation
+
+Halo and Minimal are additional notch styles; Lines remains the default and
+preserves existing lane preferences. Settings and onboarding share appearance
+controls, including continuous Halo strength and transparency sliders and inbox
+preview scenarios.
+
+All 116 ordinary SwiftPM tests, Debug build, Release archive, both signed exports,
+and website production build pass. Native onboarding welcome, permissions, sign-in
+entry, appearance choices, slider extremes, and completion were checked on the
+notched Mac. The OAuth authorization flow was not repeated. Exhaustive hover
+transitions with unequal group sizes remain unverified. The direct app and DMG
+are notarized, stapled, and accepted by Gatekeeper.
