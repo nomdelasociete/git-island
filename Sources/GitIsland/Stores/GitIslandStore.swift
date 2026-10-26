@@ -183,20 +183,22 @@ final class GitIslandStore: ObservableObject {
         return pullRequests(for: selectedGroup)
     }
 
+    var inboxProviderName: String { relayInboxEnabled ? "Relay" : "GitHub" }
+
     var dataSourceStatus: String {
         if !isAuthenticated {
             return "Not signed in"
         }
 
         if isLoading {
-            return "Refreshing GitHub"
+            return "Refreshing \(inboxProviderName)"
         }
 
         if lastRefreshDate != nil {
-            return "GitHub PR inbox"
+            return "\(inboxProviderName) PR inbox"
         }
 
-        return "GitHub not loaded"
+        return "\(inboxProviderName) not loaded"
     }
 
     var refreshStatus: String {
@@ -205,7 +207,7 @@ final class GitIslandStore: ObservableObject {
         }
 
         if isLoading {
-            return "Refreshing GitHub..."
+            return "Refreshing \(inboxProviderName)..."
         }
 
         if let nextAllowedRefreshDate, Date() < nextAllowedRefreshDate {
@@ -242,11 +244,11 @@ final class GitIslandStore: ObservableObject {
         }
 
         if isLoading {
-            return "Refreshing GitHub"
+            return "Refreshing \(inboxProviderName)"
         }
 
         if let nextAllowedRefreshDate, Date() < nextAllowedRefreshDate {
-            return "Waiting for GitHub"
+            return "Waiting for \(inboxProviderName)"
         }
 
         if lastError != nil {
