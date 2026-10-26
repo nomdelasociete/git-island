@@ -215,7 +215,7 @@ private struct IslandChromeView: View {
                 action: { store.refresh(force: true) }
             )
         } else if store.isLoading && store.selectedPullRequests.isEmpty {
-            IslandLoadingPanel()
+            IslandLoadingPanel(providerName: store.inboxProviderName)
         } else {
             VStack(spacing: IslandDesignSystem.expandedBodySpacing) {
                 PullRequestSummaryBar(
@@ -347,13 +347,14 @@ private struct IslandMessagePanel: View {
 }
 
 private struct IslandLoadingPanel: View {
+    let providerName: String
     var body: some View {
         HStack(spacing: 10) {
             ProgressView()
                 .controlSize(.small)
                 .tint(IslandDesignSystem.metaSecondary)
 
-            Text("Refreshing GitHub")
+            Text("Refreshing \(providerName)")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(IslandDesignSystem.metaSecondary)
         }

@@ -14,6 +14,7 @@
 		235E1DC4D1B15FD80F65CB59 /* RelayStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3016B6F4ED184350F6C935 /* RelayStream.swift */; };
 		3136062AB15A2EBFE6F98910 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B97BD11D7AB5910ECDDF31D /* SettingsView.swift */; };
 		3AD49261D5D3167B1CEC4D51 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F5A0B1DA09209A19128946 /* TokenStore.swift */; };
+		5233B96A3C48F665B9439DDF /* RelayInboxClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376281B2ACD1E37437D2452B /* RelayInboxClient.swift */; };
 		58F68872FEBC1498F0A55FAA /* IslandSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C9D8F38F289CB786E8AC52 /* IslandSound.swift */; };
 		61CE7B294D6CFCA208320DF6 /* GitIslandStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CB306328641020890C99F6 /* GitIslandStore.swift */; };
 		63ED7E0BFD3B60AA57463609 /* IslandPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E924AFE1180DEA11B9EB5E /* IslandPanelController.swift */; };
@@ -52,6 +53,7 @@
 		12EA4E552695646AE1C642E7 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1B1484F2BC17331354747EB3 /* KeychainTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStore.swift; sourceTree = "<group>"; };
 		34C455B8233FF49E6B5994ED /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		376281B2ACD1E37437D2452B /* RelayInboxClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayInboxClient.swift; sourceTree = "<group>"; };
 		41E533B04CCEA9EBF11420E6 /* IslandDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandDesignSystem.swift; sourceTree = "<group>"; };
 		46EBDDA141015B92E5F7FC61 /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
 		4B97BD11D7AB5910ECDDF31D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				9D23B6058CDE0811113330DF /* MergeConfettiController.swift */,
 				974E85087765FE2FAFE8305A /* OnboardingWindowController.swift */,
 				D14C2D1F194C162858F2B516 /* RelayDeviceSession.swift */,
+				376281B2ACD1E37437D2452B /* RelayInboxClient.swift */,
 				BD3016B6F4ED184350F6C935 /* RelayStream.swift */,
 				AC5FD425305A4C6C7AE89A6C /* SettingsWindowController.swift */,
 				DE4E95B24D1E8C11BCEC389C /* StatusChangeCueController.swift */,
@@ -341,6 +344,7 @@
 				F06A2A9A9A0DF5BCB93D86B2 /* OnboardingWindowController.swift in Sources */,
 				C139049F6B9362ED4EF492C9 /* PullRequest.swift in Sources */,
 				7FFBA998907A55B33E15F966 /* RelayDeviceSession.swift in Sources */,
+				5233B96A3C48F665B9439DDF /* RelayInboxClient.swift in Sources */,
 				235E1DC4D1B15FD80F65CB59 /* RelayStream.swift in Sources */,
 				3136062AB15A2EBFE6F98910 /* SettingsView.swift in Sources */,
 				81BBA30BE7B9E48A34F0780C /* SettingsWindowController.swift in Sources */,

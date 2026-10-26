@@ -60,7 +60,7 @@ final class RelayStream {
     private var session: URLSession?
     private var generation: UUID?
 
-    func start(configuration: RelayConfiguration, receive: @escaping @MainActor @Sendable (RelayEventParser.Event?) -> Void) {
+    func start(configuration: RelayConfiguration, inbox: Bool = false, receive: @escaping @MainActor @Sendable (RelayEventParser.Event?) -> Void) {
         stop()
         let settings = URLSessionConfiguration.ephemeral
         settings.timeoutIntervalForRequest = 65
@@ -78,6 +78,7 @@ final class RelayStream {
             while !Task.isCancelled {
                 do {
                     var request = configuration.request(path: "stream")
+                    if inbox { request.setValue("1", forHTTPHeaderField: "X-Relay-Inbox") }
                     request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
                     let (bytes, response) = try await session.bytes(for: request)
                     defer { bytes.task.cancel() }

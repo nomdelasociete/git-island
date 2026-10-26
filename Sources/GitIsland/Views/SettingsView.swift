@@ -882,7 +882,7 @@ private struct RefreshSettingsPane: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                 if store.isAuthenticated && store.relayConnected && !store.githubRefreshPaused {
-                    LabeledContent("If the connection drops", value: "Check GitHub every minute")
+                    LabeledContent("If the connection drops", value: store.relayInboxEnabled ? "Check Relay every 30 seconds" : "Check GitHub every minute")
                 }
             } header: {
                 Text("How your inbox stays updated")
@@ -910,7 +910,9 @@ private struct RefreshSettingsPane: View {
 
             if store.isAuthenticated && !store.relayConnected {
                 Section {
-                    if store.hasRelayConfiguration {
+                    if store.relayInboxEnabled {
+                        LabeledContent("Check Relay", value: "Every 30 seconds")
+                    } else if store.hasRelayConfiguration {
                         if !store.githubRefreshPaused {
                             LabeledContent("Check GitHub", value: "Every minute until reconnected")
                         }
@@ -928,6 +930,24 @@ private struct RefreshSettingsPane: View {
             }
 
             RelayAuthorizationSection(device: store.relayDevice)
+            Section("Inbox sync") {
+                Text("Relay can store and synchronize your PR titles, reviews, checks and repository metadata across your computers, including repositories outside the connected installations. Merge and branch-update actions stay on this Mac.")
+                Text("This requires separate GitHub browser authorization. GitHub’s repo scope also grants write access, although Relay only uses it for reads.")
+                    .font(.caption).foregroundStyle(.secondary)
+                Button(store.relayInboxSetupBusy ? "Connecting…" : "Authorize inbox sync…") { store.authorizeRelayInbox() }
+                    .disabled(store.currentRelayConfiguration == nil || store.relayInboxSetupBusy)
+                if store.relayInboxEnabled {
+                    Text("Server sync enabled. GitHub reads will not resume locally if Relay is unavailable.")
+                    Button("Disable sync on this Mac and resume local checks") { store.disableRelayInbox() }
+                }
+                if store.relayInboxAuthorizationPending {
+                    Button("Cancel pending authorization") { store.cancelRelayInboxAuthorization() }
+                }
+                Button("Delete server inbox for all my Macs", role: .destructive) { store.revokeRelayInbox() }
+                    .disabled(store.currentRelayConfiguration == nil || store.relayInboxSetupBusy)
+                Text("Disabling sync on this Mac keeps the server authorization and cache. Delete the server inbox separately to remove them for all your Macs.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             RelaySettingsSection(store: store)
         }
         .formStyle(.grouped)

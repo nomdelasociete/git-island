@@ -5,6 +5,7 @@ import Foundation
 struct RelayHTTPReply: Sendable {
     let status: Int
     let data: Data
+    var retryAfter: TimeInterval? = nil
 }
 
 struct RelayDeviceAPI: Sendable {
@@ -18,7 +19,7 @@ struct RelayDeviceAPI: Sendable {
         defer { session.invalidateAndCancel() }
         let (data, response) = try await session.data(for: request)
         guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-        return RelayHTTPReply(status: response.statusCode, data: data)
+        return RelayHTTPReply(status: response.statusCode, data: data, retryAfter: response.value(forHTTPHeaderField: "Retry-After").flatMap(TimeInterval.init))
     }
 
     func post(_ path: String, body: [String: String]? = nil, access: String? = nil) async throws -> RelayHTTPReply {
@@ -97,6 +98,11 @@ final class RelayDeviceSession: ObservableObject {
     private var rejectedAccess = false
     var githubToken: () -> String? = { nil }
     private var verifiedNativeToken: String?
+    private var verifiedSubject: String?
+    var inboxSubject: String? {
+        guard verifiedNativeToken == githubToken(), verifiedAccessToken == credentials?.pair.access_token else { return nil }
+        return verifiedSubject
+    }
     private var verifiedAccessToken: String?
     private var identityGeneration = 0
     private var identityTask: Task<Void, Never>?
@@ -366,6 +372,7 @@ final class RelayDeviceSession: ObservableObject {
                 message = "Live updates use a different GitHub account. Authorize this Mac again using the same account as the app."
                 return nil
             }
+            verifiedSubject = identity.subject
             return native
         } catch {
             if !Task.isCancelled, generation == identityGeneration {

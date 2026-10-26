@@ -7,6 +7,11 @@ enum UserPreferences {
     static let relayAuthorityOrigin = "https://access.relay.nomdelasociete.com"
     static let relayBrowserOrigin = "https://auth.relay.nomdelasociete.com"
 
+    static var relayInboxEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "relayInboxEnabled") }
+        set { UserDefaults.standard.set(newValue, forKey: "relayInboxEnabled") }
+    }
+
     static var relayOrigin: String {
         get { UserDefaults.standard.string(forKey: "relayOrigin") ?? officialRelayOrigin }
         set { UserDefaults.standard.set(newValue, forKey: "relayOrigin") }

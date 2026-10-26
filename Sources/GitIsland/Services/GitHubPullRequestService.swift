@@ -43,12 +43,14 @@ actor GitHubPullRequestService {
 
         // Prefer the batch GraphQL path; fall back to REST whenever it cannot
         // return the complete inbox.
-        if let pullRequests = try? await fetchPullRequestsViaGraphQL(
-            currentLogin: currentLogin,
-            repositoryFullNames: repositoryFullNames,
-            token: token
-        ) {
-            return pullRequests
+        do {
+            return try await fetchPullRequestsViaGraphQL(currentLogin: currentLogin, repositoryFullNames: repositoryFullNames, token: token)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch let error as GitHubServiceError where error.isRateLimited {
+            throw error
+        } catch {
+            try Task.checkCancellation()
         }
 
         let candidates = try await fetchPullRequestInboxCandidates(
@@ -235,6 +237,9 @@ actor GitHubPullRequestService {
             body: request
         )
 
+        if response.errors?.contains(where: { $0.type == "RATE_LIMITED" || $0.message?.localizedCaseInsensitiveContains("rate limit") == true }) == true {
+            throw GitHubServiceError.api(statusCode: 429, message: "GitHub rate limit reached", retryAfterDate: nil)
+        }
         guard response.errors?.isEmpty != false,
               let data = response.data,
               data.isComplete else {
@@ -1035,6 +1040,7 @@ private struct GitHubGraphQLResponse<ResponseData: Decodable>: Decodable {
 }
 
 private struct GitHubGraphQLError: Decodable {
+    let type: String?
     let message: String?
 }
 
