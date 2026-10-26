@@ -18,11 +18,11 @@ struct AppUpdateSettings: View {
         if updates.isAvailable {
             Toggle("Automatically check for updates", isOn: Binding(
                 get: { updates.automaticallyChecks },
-                set: updates.setAutomaticallyChecks
+                set: { updates.setAutomaticallyChecks($0) }
             ))
             Toggle("Automatically download and install updates", isOn: Binding(
                 get: { updates.automaticallyDownloads },
-                set: updates.setAutomaticallyDownloads
+                set: { updates.setAutomaticallyDownloads($0) }
             ))
             .disabled(!updates.automaticallyChecks)
             Text("Updates install when Git Island quits. If it stays open, you’ll be prompted to restart.")
