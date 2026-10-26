@@ -8,7 +8,7 @@ SPARKLE_BIN="${SPARKLE_BIN:?Set SPARKLE_BIN to the pinned Sparkle bin directory}
 ACCOUNT=com.nomdelasociete.GitIsland
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || { echo 'Invalid version' >&2; exit 2; }
 [[ "$(basename "$DMG")" == "Git-Island-$VERSION.dmg" && -f "$DMG" ]] || { echo 'Unexpected DMG filename' >&2; exit 2; }
-[[ -x "$SPARKLE_BIN/generate_appcast" && -x "$SPARKLE_BIN/sign_update" ]] || exit 2
+[[ -x "$SPARKLE_BIN/generate_appcast" && -x "$SPARKLE_BIN/sign_update" && -x "$SPARKLE_BIN/generate_keys" ]] || exit 2
 # Require a valid notarized distribution artifact before it can be advertised.
 spctl --assess --type open --context context:primary-signature "$DMG"
 xcrun stapler validate "$DMG"
@@ -26,6 +26,10 @@ assert info['CFBundleIdentifier'] == 'com.nomdelasociete.GitIsland', 'Wrong app 
 PYINFO
 codesign --verify --deep --strict "$APP"
 spctl --assess --type execute "$APP"
+# sign_update verifies against the selected Keychain account, not the app key.
+# Bind that account to the verified bundle before generating any feed candidate.
+SIGNING_PUBLIC_KEY="$("$SPARKLE_BIN/generate_keys" --account "$ACCOUNT" -p)"
+python3 "$ROOT_DIR/script/verify_update_bundle.py" "$APP" direct "$SIGNING_PUBLIC_KEY"
 hdiutil detach -quiet "$MOUNT"
 rmdir "$MOUNT"
 trap - EXIT

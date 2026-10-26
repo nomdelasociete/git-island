@@ -15,6 +15,8 @@ if channel == 'direct':
     assert framework.is_dir(), 'Missing embedded updater'
     assert info['SUFeedURL'] == 'https://gitis.land/appcast.xml'
     assert info['SUPublicEDKey'] == 'KSSnb4UT84hhhYlq55Icrcn4oMUGbyObjmfDVCZhyJ4='
+    if len(sys.argv) > 3 and sys.argv[3] != info['SUPublicEDKey']:
+        raise ValueError('Signing account public key does not match the app update key')
     for key in ('SUEnableInstallerLauncherService', 'SUEnableAutomaticChecks',
                 'SUAutomaticallyUpdate', 'SUVerifyUpdateBeforeExtraction'):
         assert info[key] is True, f'{key} must be a plist boolean'
