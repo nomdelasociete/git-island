@@ -145,7 +145,13 @@ enum UserPreferences {
                 gap: defaults.object(forKey: outlineLaneGapKey) == nil
                     ? standard.gap : CGFloat(defaults.double(forKey: outlineLaneGapKey)),
                 maxLanes: defaults.object(forKey: maxOutlineLanesKey) == nil
-                    ? standard.maxLanes : defaults.integer(forKey: maxOutlineLanesKey)
+                    ? standard.maxLanes : defaults.integer(forKey: maxOutlineLanesKey),
+                appearance: defaults.string(forKey: "outlineAppearance")
+                    .flatMap(IslandOutlineAppearance.init(rawValue:)) ?? standard.appearance,
+                haloStrength: defaults.object(forKey: "outlineHaloStrength") == nil
+                    ? standard.haloStrength : CGFloat(defaults.double(forKey: "outlineHaloStrength")),
+                haloTransparency: defaults.object(forKey: "outlineHaloTransparency") == nil
+                    ? standard.haloTransparency : CGFloat(defaults.double(forKey: "outlineHaloTransparency"))
             ).clamped()
         }
         set {
@@ -153,6 +159,9 @@ enum UserPreferences {
             defaults.set(Double(newValue.width), forKey: outlineLaneWidthKey)
             defaults.set(Double(newValue.gap), forKey: outlineLaneGapKey)
             defaults.set(newValue.maxLanes, forKey: maxOutlineLanesKey)
+            defaults.set(newValue.appearance.rawValue, forKey: "outlineAppearance")
+            defaults.set(Double(newValue.haloStrength), forKey: "outlineHaloStrength")
+            defaults.set(Double(newValue.haloTransparency), forKey: "outlineHaloTransparency")
         }
     }
 

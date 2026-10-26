@@ -8,9 +8,8 @@ struct IslandOutlineConfiguration: Equatable {
     let accessibilityLabel: String
 }
 
-/// A ring around the island with one lane per pull request. Each status owns
-/// a share of the ring proportional to its count and draws its lanes there,
-/// hugging the notch and stacking outward; the ring morphs with the surface.
+/// Proportional status segments rendered as a halo, stacked lanes, or a thin
+/// outline. All appearances follow the same surface morph and arrival cues.
 struct IslandStatusOutline: View {
     let shape: NotchIslandShape
     let configuration: IslandOutlineConfiguration
@@ -18,7 +17,8 @@ struct IslandStatusOutline: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var cue: OutlineCue?
 
-    private var style: OutlineLaneStyle { configuration.laneStyle }
+    private var appearance: IslandOutlineAppearance { configuration.laneStyle.appearance }
+    private var style: OutlineLaneStyle { configuration.laneStyle.renderingStyle }
     private var laneWidth: CGFloat { style.width }
 
     var body: some View {
@@ -27,9 +27,15 @@ struct IslandStatusOutline: View {
 
             ZStack {
                 // Black backing first so the surface grows only as far as the lanes do.
-                ForEach(lanes) { lane in
-                    OutlineLaneShape(base: shape, lane: lane, style: style)
-                        .stroke(IslandDesignSystem.surfaceFill, lineWidth: style.pitch + laneWidth)
+                if appearance == .lines {
+                    ForEach(lanes) { lane in
+                        OutlineLaneShape(base: shape, lane: lane, style: style)
+                            .stroke(IslandDesignSystem.surfaceFill, lineWidth: style.pitch + laneWidth)
+                    }
+                }
+
+                if appearance == .halo {
+                    halo(elapsed: elapsed)
                 }
 
                 ForEach(lanes) { lane in
@@ -43,6 +49,7 @@ struct IslandStatusOutline: View {
                     }
                 }
             }
+            .opacity(appearance == .halo ? configuration.laneStyle.haloOpacity : 1)
         }
         .animation(reduceMotion ? nil : IslandDesignSystem.outlineAnimation, value: configuration.segments)
         .animation(reduceMotion ? nil : IslandDesignSystem.outlineAnimation, value: style)
@@ -55,6 +62,38 @@ struct IslandStatusOutline: View {
         }
     }
 
+    private func halo(elapsed: TimeInterval?) -> some View {
+        let settings = configuration.laneStyle
+        return ZStack {
+            ForEach(lanes) { lane in
+                let track = OutlineLaneShape(base: shape, lane: lane, style: style)
+                let swell = thickening(of: lane.group, elapsed: elapsed)
+                track.stroke(lane.group.tint, lineWidth: settings.haloStroke + swell)
+                    .blur(radius: settings.haloBlur)
+                    .opacity(0.75)
+                track.stroke(lane.group.tint, lineWidth: 2 + settings.haloStrength * 16 + swell)
+                    .blur(radius: 1 + settings.haloStrength * 4.6)
+            }
+        }
+        .opacity(Double(settings.haloStrength))
+        // Keep the black surface and its text clear; only the outside emits light.
+        .mask {
+            Rectangle().overlay { shape.fill(.black).blendMode(.destinationOut) }
+                .compositingGroup()
+        }
+        // The existing expanded host has an 8pt side margin. Feather the light
+        // there rather than widening/repositioning the panel or clipping sharply.
+        .mask {
+            HStack(spacing: 0) {
+                LinearGradient(colors: [.clear, .white], startPoint: .leading, endPoint: .trailing)
+                    .frame(width: IslandDesignSystem.surfaceOvershootInset)
+                Rectangle().fill(.white)
+                LinearGradient(colors: [.white, .clear], startPoint: .leading, endPoint: .trailing)
+                    .frame(width: IslandDesignSystem.surfaceOvershootInset)
+            }
+        }
+    }
+
     /// Lanes of the non-empty segments, each knowing how many lanes it shares
     /// with its neighbours so the extra ones can bend onto the last shared lane.
     private var lanes: [OutlineLane] {
@@ -63,7 +102,8 @@ struct IslandStatusOutline: View {
             let segment = visible[index]
             let previous = index > visible.startIndex ? visible[index - 1] : nil
             let next = index < visible.endIndex - 1 ? visible[index + 1] : nil
-            return (0..<segment.lanes).map { lane in
+            let laneCount = appearance == .lines ? segment.lanes : 1
+            return (0..<laneCount).map { lane in
                 OutlineLane(
                     group: segment.group,
                     index: lane,
@@ -71,7 +111,7 @@ struct IslandStatusOutline: View {
                     end: segment.end,
                     sharedWithPrevious: previous.map { min($0.lanes, segment.lanes) },
                     sharedWithNext: next.map { min($0.lanes, segment.lanes) },
-                    isFused: segment.isFused
+                    isFused: appearance == .lines && segment.isFused
                 )
             }
         }
