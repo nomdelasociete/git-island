@@ -27,6 +27,11 @@ brew install --cask nomdelasociete/tap/git-island
 Update with `brew update && brew upgrade --cask --greedy nomdelasociete/tap/git-island`.
 Homebrew does not install updates in the background by default.
 
+If the tap still offers 0.15, use the 0.16 DMG linked above for the initial
+upgrade. The Homebrew 0.16 update is tracked in
+[the tap PR](https://github.com/nomdelasociete/homebrew-tap/pull/3); the upgrade
+command installs 0.16 only after that cask update is merged.
+
 Existing 0.15 and older installations need one manual upgrade to 0.16 to receive
 automatic updates through Sparkle. TestFlight continues to manage its own updates.
 
