@@ -1,9 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
-  <channel>
-    <title>Git Island</title>
-    <link>https://gitis.land</link>
-    <description>Signed updates for Git Island for macOS.</description>
-    <language>en</language>
-  </channel>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Git Island</title>
+        <link>https://gitis.land</link>
+        <description>Signed updates for Git Island for macOS.</description>
+        <language>en</language>
+        <item>
+            <title>0.16</title>
+            <pubDate>Mon, 26 Oct 2026 23:32:50 +0300</pubDate>
+            <link>https://gitis.land</link>
+            <sparkle:version>202610260003</sparkle:version>
+            <sparkle:shortVersionString>0.16</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/nomdelasociete/git-island/releases/download/v0.16/Git-Island-0.16.dmg" length="6982524" type="application/octet-stream" sparkle:edSignature="Z8/jqHJz8YY4knY+hV1N2qdTkmWw5NFhA1U9gjhaei9GY8B4678BLdnYugwHQoC28wFYomDZn90QLTgY5bjRCg=="/>
+        </item>
+    </channel>
 </rss>
