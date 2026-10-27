@@ -12,9 +12,11 @@ other displays do not show it. The menu-bar controls remain available.
 
 ## Install
 
-Download the signed, Apple-notarized [Git Island 0.15 installer](https://github.com/nomdelasociete/git-island/releases/download/v0.15/Git-Island-0.15.dmg),
-open it and drag Git Island to Applications. Updates are manual: download the
-new installer from [Releases](https://github.com/nomdelasociete/git-island/releases).
+Download the signed, Apple-notarized [Git Island 0.16 installer](https://github.com/nomdelasociete/git-island/releases/download/v0.16/Git-Island-0.16.dmg),
+open it and drag Git Island to Applications. This edition checks for and downloads
+signed updates automatically, installs them when the app quits, and offers a restart
+if it stays open. Configure updates in General settings or use **Check for Updates…**
+in the menu.
 
 Or install with Homebrew:
 
@@ -22,14 +24,16 @@ Or install with Homebrew:
 brew install --cask nomdelasociete/tap/git-island
 ```
 
-Update with `brew update && brew upgrade --cask nomdelasociete/tap/git-island`.
+Update with `brew update && brew upgrade --cask --greedy nomdelasociete/tap/git-island`.
 Homebrew does not install updates in the background by default.
 
-The next direct-distribution release adds automatic updates through Sparkle.
-Existing 0.15 and older installations need one manual upgrade to that release;
-they cannot acquire the updater automatically. In builds that include it, General
-settings controls automatic checks/downloads and the menu offers **Check for
-Updates…**. TestFlight continues to manage its own updates.
+If the tap still offers 0.15, use the 0.16 DMG linked above for the initial
+upgrade. The Homebrew 0.16 update is tracked in
+[the tap PR](https://github.com/nomdelasociete/homebrew-tap/pull/3); the upgrade
+command installs 0.16 only after that cask update is merged.
+
+Existing 0.15 and older installations need one manual upgrade to 0.16 to receive
+automatic updates through Sparkle. TestFlight continues to manage its own updates.
 
 ## Build from source
 

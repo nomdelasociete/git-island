@@ -128,8 +128,8 @@
   are persisted in UserDefaults. Visible-group selection is transient. Sign-out
   clears the allowlist, mutes, and hidden pull requests.
 - Idle auto-refresh interval preference is saved in UserDefaults.
-- Updates are manual for direct downloads; TestFlight is a separate distribution
-  channel. No Sparkle updater is included.
+- Direct-download versions through 0.15 require manual updates. Version 0.16
+  introduces Sparkle; TestFlight remains a separate Apple-managed channel.
 - Second design pass: true notch gap, wing tabs, list-style rows, calmer motion.
 - Further shape tuning may still be needed against specific MacBook notch sizes.
 
@@ -317,7 +317,7 @@ TestFlight installation or runtime launch. Homebrew tap PR #2 was merged on
 before CI deployment.
 
 
-## Automatic application updates (prepared)
+## Automatic application updates (before the 0.16 release)
 
 Settings now reads the actual bundle version/build instead of the stale
 `2026-06-28a` label. A separate GitIslandDirect Xcode target embeds Sparkle 2.10.1
@@ -328,9 +328,9 @@ sandbox installer service. The signing key is in the release operator's Keychain
 The website has an initially empty public appcast; the local preparation script
 generates signed entries from notarized DMGs without publishing anything.
 
-This is not yet a distributed updater. Existing 0.15 installations need one
-manual upgrade. Signed old-to-new runtime acceptance and an explicitly authorized
-new release remain required before announcing automatic updates as available.
+At this preparation stage, the updater was not yet distributed. The 0.16 release
+record below supersedes that status. Existing 0.15 installations still need one
+manual upgrade to acquire the updater.
 
 Validation: 127 ordinary Swift tests pass, as do the unsigned Debug build and
 both Release builds. Inspection of built bundles confirms the direct updater's
@@ -339,3 +339,33 @@ absence of Sparkle/configuration from the Apple build. The website build include
 the appcast. A signed synthetic file verifies successfully and a modified copy
 fails verification; feed checks reject insecure URLs, missing signatures and
 archive-length mismatches. These checks do not replace installation acceptance.
+
+## Version 0.16 distribution
+
+Version 0.16 (202610260003) was archived separately for TestFlight and Developer ID
+from the merged updater implementation. Both signed exports succeeded, with
+arm64 and x86_64 in the direct app. TestFlight build
+`cba752f5-b62e-4910-bc9f-c31f80572a71` is VALID and IN_BETA_TESTING for the existing
+internal testers group; its en-US What to Test notes were read back and verified.
+No new TestFlight installation/runtime launch is claimed.
+
+The Developer ID app and DMG are notarized and stapled. The v0.16 release is
+published; the downloaded DMG passes Gatekeeper and matches SHA-256
+`a900a674ab5d183a806ffea4ab312d7062862dc494b9656bdc93d629cfeb70ba`.
+
+Native acceptance used signed/notarized copies with an isolated bundle identity
+and a localhost feed. Sparkle automatically fetched the signed archive and
+installed it on quit, advancing the test build from 202610260001 to 202610260002.
+The replacement relaunched successfully, displayed the new build and retained the
+Halo preference selected before installation. The installed app still passes
+signature verification and Gatekeeper. A modified archive advertised as a newer
+build was rejected with an invalid-signature alert; the installed build remained
+unchanged. Actual version/build display, automatic-update defaults, no-update
+response and unavailable-server errors also passed.
+
+The production installation and its GitHub session were not modified. Credential
+preservation with a signed-in account, interruption recovery and updating from the
+production HTTPS feed were not exercised by this isolated recipe. The prepared
+production feed is signed at the archive level and validated against the released
+DMG. Website download links and that feed require PR #19 merge and CI deployment;
+Homebrew cask PR #3 adds 0.16 and `auto_updates true` and remains open for review.
