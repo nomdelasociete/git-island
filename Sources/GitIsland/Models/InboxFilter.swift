@@ -55,7 +55,7 @@ enum InboxFilter {
         }
     }
 
-    /// Drop a hide once its pull request leaves the inbox or its signature changes.
+    /// Drop a hide only when a fetched pull request has a changed signature.
     static func reconciledHiddenPullRequests(
         _ hiddenPullRequests: [HiddenPullRequest],
         fetched: [PullRequest]
@@ -63,7 +63,9 @@ enum InboxFilter {
         let byID = Dictionary(fetched.map { ($0.id, $0) }, uniquingKeysWith: { current, _ in current })
         return hiddenPullRequests.filter { hidden in
             guard let pullRequest = byID[hidden.id] else {
-                return false
+                // Absence can be temporary or caused by repository filtering.
+                // It is not evidence that the pull request changed or closed.
+                return true
             }
             return hidden.matches(pullRequest)
         }
