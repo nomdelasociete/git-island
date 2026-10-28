@@ -38,7 +38,7 @@ final class InboxFilterTests: XCTestCase {
         XCTAssertEqual(visible.map(\.id), [1])
     }
 
-    func testChangedSignatureOrClosedPullRequestDropsTheHide() {
+    func testChangedSignatureDropsTheHideButMissingPullRequestKeepsIt() {
         let hidden = HiddenPullRequest(pullRequest: pullRequest(id: 7, repository: "team/app", reason: "Review required"))
         let changed = pullRequest(id: 7, repository: "team/app", reason: "CI failed", group: .blocked, headSHA: "abc")
         let kept = pullRequest(id: 8, repository: "team/app", reason: "Review required")
@@ -48,7 +48,7 @@ final class InboxFilterTests: XCTestCase {
             fetched: [changed, kept]
         )
 
-        XCTAssertEqual(reconciled.map(\.id), [8])
+        XCTAssertEqual(reconciled.map(\.id), [8, 9])
         XCTAssertEqual(
             InboxFilter.visible(
                 [changed, kept],
@@ -59,6 +59,30 @@ final class InboxFilterTests: XCTestCase {
             ).map(\.id),
             [7]
         )
+    }
+
+    func testHiddenPullRequestStaysHiddenAfterMissingRefreshesUntilItChanges() {
+        let original = pullRequest(id: 7, repository: "team/app")
+        let hidden = [HiddenPullRequest(pullRequest: original)]
+        let unrelated = pullRequest(id: 8, repository: "other/tool")
+        var reconciled = InboxFilter.reconciledHiddenPullRequests(hidden, fetched: [])
+        reconciled = InboxFilter.reconciledHiddenPullRequests(reconciled, fetched: [unrelated])
+        reconciled = InboxFilter.reconciledHiddenPullRequests(reconciled, fetched: [original, unrelated])
+
+        XCTAssertEqual(reconciled, hidden)
+        XCTAssertEqual(
+            InboxFilter.visible(
+                [original, unrelated],
+                mode: .all,
+                selectedRepositories: [],
+                mutedRepositories: [],
+                hiddenPullRequests: reconciled
+            ).map(\.id),
+            [8]
+        )
+
+        let changed = pullRequest(id: 7, repository: "team/app", headSHA: "new-head")
+        XCTAssertTrue(InboxFilter.reconciledHiddenPullRequests(reconciled, fetched: [changed]).isEmpty)
     }
 
     private func pullRequest(
