@@ -369,3 +369,28 @@ production HTTPS feed were not exercised by this isolated recipe. The prepared
 production feed is signed at the archive level and validated against the released
 DMG. Website download links and that feed require PR #19 merge and CI deployment;
 Homebrew cask PR #3 adds 0.16 and `auto_updates true` and remains open for review.
+
+## Version 0.17 distribution
+
+Version 0.17 (202610280001) includes the fix that preserves hidden PRs across
+missing or repository-filtered refresh results. New commits or changes to the
+status group/reason still clear the hide; previously forgotten hides cannot be
+recovered automatically.
+
+The separate Developer ID and TestFlight archives were exported successfully.
+The direct app contains arm64 and x86_64 binaries; updater isolation checks passed
+for both distribution variants. The direct app and DMG were notarized and stapled.
+The v0.17 GitHub release is published, and a fresh download matches SHA-256
+`77c3ed59c7b18a30be1517c6d3e1579d3b298b29babc867e131e179c8a57e4a0`.
+The downloaded DMG passed Gatekeeper and staple validation on the Mac mini.
+
+The release version PR passed CI. The Mac mini unsigned build and inbox-filter
+regression passed; the complete remote test run had three assertion failures in
+the existing Keychain enrollment persistence test. No app was launched or replaced
+on the maintainer's Mac. Release signing/export/publication there was explicitly
+authorized for this version.
+
+The TestFlight upload is committed and awaiting processing. Its build-specific
+en-US What to Test notes must be verified before reporting availability.
+The signed 0.17 updater feed and website link require this PR's merge and CI
+deployment. Homebrew cask PR #4 is open for review.
