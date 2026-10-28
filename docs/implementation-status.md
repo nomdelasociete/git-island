@@ -390,7 +390,9 @@ the existing Keychain enrollment persistence test. No app was launched or replac
 on the maintainer's Mac. Release signing/export/publication there was explicitly
 authorized for this version.
 
-The TestFlight upload is committed and awaiting processing. Its build-specific
-en-US What to Test notes must be verified before reporting availability.
+TestFlight build `eef600e1-2a42-4f18-aa9e-78667e9208f9` is VALID and
+IN_BETA_TESTING for the existing internal testers group, which automatically
+receives all builds. Its build-specific en-US What to Test notes were read back
+and verified. No new TestFlight installation/runtime validation is claimed.
 The signed 0.17 updater feed and website link require this PR's merge and CI
 deployment. Homebrew cask PR #4 is open for review.
